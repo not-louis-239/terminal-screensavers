@@ -1,150 +1,160 @@
 {
-    "kw_packs": {
-        "python": [
-            {
-                "name": "keywords",
-                "weight": 1.0,
-                "colour": [187, 154, 247],
-                "words": ["def", "class", "if", "elif", "else", "for", "while", "break", "continue", "return", "yield", "from", "import", "as", "try", "except", "finally", "raise", "with", "pass", "lambda", "global", "nonlocal", "assert", "del", "async", "await"]
-            },
-            {
-                "name": "builtins",
-                "weight": 0.8,
-                "colour": [130, 200, 255],
-                "words": ["len", "range", "print", "enumerate", "zip", "map", "filter", "sorted", "sum", "min", "max", "any", "all", "abs", "round", "reversed", "slice", "id", "type"]
-            },
-            {
-                "name": "types",
-                "weight": 0.7,
-                "colour": [13, 185, 215],
-                "words": ["int", "float", "str", "bool", "list", "dict", "tuple", "set", "bytes", "bytearray", "None", "complex", "frozenset", "memoryview"]
-            },
-            {
-                "name": "exceptions",
-                "weight": 0.6,
-                "colour": [255, 120, 120],
-                "words": ["Exception", "ValueError", "TypeError", "KeyError", "IndexError", "ZeroDivisionError", "RuntimeError", "AssertionError", "ImportError", "OSError", "FileNotFoundError", "NameError", "AttributeError"]
-            },
-            {
-                "name": "decorators",
-                "weight": 0.3,
-                "colour": [122, 162, 247],
-                "words": ["@staticmethod", "@classmethod", "@property", "@dataclass", "@lru_cache", "@wraps", "@abstractmethod"]
-            },
-            {
-                "name": "integers",
-                "weight": 0.8,
-                "colour": [255, 158, 100],
-                "words": ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-            },
-            {
-                "name": "strings",
-                "weight": 0.5,
-                "colour": [135, 240, 135],
-                "words": ["\"hello\"", "\"world\"", "\"python\"", "\"screensaver\"", "\"example\"", "\"string\"", "\"foo\"", "\"bar\"", "\"baz\"", "\"quux\"", "\"test\"", "\"data\"", "\"code\"", "\"run\""]
-            },
-            {
-                "name": "symbols",
-                "weight": 0.4,
-                "colour": [180, 255, 255],
-                "words": ["(", ")", "[", "]", "{", "}", ",", ":", ".", "+", "-", "*", "**", "/", "//", "%", "=", "==", "!=", "<", ">", "<=", ">=", "->", "@", "&", "|", "^", "~", "<<", ">>"]
-            },
-            {
-                "name": "kwargs",
-                "weight": 0.3,
-                "colour": [255, 215, 40],
-                "words": ["*args", "**kwargs"]
-            },
-            {
-                "name": "special_refs",
-                "weight": 0.5,
-                "colour": [255, 105, 180],
-                "words": ["self", "cls", "__init__", "__name__", "__main__", "__str__", "__repr__", "__dict__"]
-            },
-            {
-                "name": "modules",
-                "weight": 0.4,
-                "colour": [255, 170, 255],
-                "words": [
-                    "os", "sys", "time", "random", "json", "re", "math", "datetime", "collections", "itertools", "functools", "pathlib", "threading", "asyncio", "requests", "numpy", "pandas", "pytest", "flask", "django"
-                ]
-            }
-        ],
-        "git": [
-            {
-                "name": "commands",
-                "weight": 1.0,
-                "colour": [255, 255, 125],
-                "words": ["commit", "push", "pull", "fetch", "checkout", "merge", "rebase", "branch", "stash", "clone", "reset", "revert", "tag", "diff", "log", "init", "remote"]
-            },
-            {
-                "name": "actions",
-                "weight": 0.9,
-                "colour": [255, 150, 100],
-                "words": ["add", "rm", "mv", "show", "status", "config", "apply", "cherry-pick", "bisect", "clean"]
-            },
-            {
-                "name": "objects",
-                "weight": 0.8,
-                "colour": [150, 200, 255],
-                "words": ["HEAD", "origin", "master", "main", "upstream", "blob", "tree", "commit", "index", "stash@{0}", "refs", "tags"]
-            },
-            {
-                "name": "flags",
-                "weight": 0.6,
-                "colour": [255, 180, 255],
-                "words": ["--amend", "--hard", "--soft", "--force", "--verbose", "--all", "--patch", "--stat", "--squash"]
-            },
-            {
-                "name": "branches",
-                "weight": 0.7,
-                "colour": [180, 255, 180],
-                "words": ["main", "develop", "feature", "bugfix", "release", "hotfix", "experiment", "testing"]
-            },
-            {
-                "name": "remotes",
-                "weight": 0.5,
-                "colour": [255, 220, 140],
-                "words": ["origin", "upstream", "fork", "deploy", "backup"]
-            }
-        ],
-        "bash": [
-            {
-                "name": "core_cmds",
-                "weight": 1.0,
-                "colour": [50, 255, 50],
-                "words": ["ls", "cd", "pwd", "mkdir", "rm", "cp", "mv", "touch", "cat", "echo", "grep", "sed", "awk", "find", "chmod", "chown", "tar", "curl", "wget", "ping", "top", "kill", "ps", "df", "du"]
-            },
-            {
-                "name": "logic",
-                "weight": 0.8,
-                "colour": [180, 115, 255],
-                "words": ["if", "then", "else", "fi", "for", "while", "do", "done", "case", "esac", "match", "select", "until", "break", "continue", "return"]
-            },
-            {
-                "name": "vars",
-                "weight": 0.7,
-                "colour": [100, 255, 255],
-                "words": ["PATH", "HOME", "USER", "SHELL", "BASH_VERSION", "RANDOM", "$@", "$?", "$*", "$0", "$1", "$2", "$$", "$!"]
-            },
-            {
-                "name": "processes",
-                "weight": 0.6,
-                "colour": [255, 180, 180],
-                "words": ["&", "|", "&&", "||", ";", "()", "{}", "<", ">", ">>", "<<<", "read", "exec"]
-            },
-            {
-                "name": "utilities",
-                "weight": 0.5,
-                "colour": [255, 255, 180],
-                "words": ["diff", "cmp", "sort", "uniq", "cut", "head", "tail", "xargs", "tee", "split"]
-            },
-            {
-                "name": "network",
-                "weight": 0.4,
-                "colour": [180, 255, 255],
-                "words": ["ssh", "scp", "rsync", "ftp", "telnet", "netstat", "curl", "wget", "ping", "traceroute"]
-            }
-        ]
-    }
+    "$schema": "./kw_packs.schema.json",
+    "kw_packs": [
+        {
+            "name": "python",
+            "kw_groups": [
+                {
+                    "name": "keywords",
+                    "weight": 1.0,
+                    "colour": [187, 154, 247],
+                    "words": ["def", "class", "if", "elif", "else", "for", "while", "break", "continue", "return", "yield", "from", "import", "as", "try", "except", "finally", "raise", "with", "pass", "lambda", "global", "nonlocal", "assert", "del", "async", "await"]
+                },
+                {
+                    "name": "builtins",
+                    "weight": 0.8,
+                    "colour": [130, 200, 255],
+                    "words": ["len", "range", "print", "enumerate", "zip", "map", "filter", "sorted", "sum", "min", "max", "any", "all", "abs", "round", "reversed", "slice", "id", "type"]
+                },
+                {
+                    "name": "types",
+                    "weight": 0.7,
+                    "colour": [13, 185, 215],
+                    "words": ["int", "float", "str", "bool", "list", "dict", "tuple", "set", "bytes", "bytearray", "None", "complex", "frozenset", "memoryview"]
+                },
+                {
+                    "name": "exceptions",
+                    "weight": 0.6,
+                    "colour": [255, 120, 120],
+                    "words": ["Exception", "ValueError", "TypeError", "KeyError", "IndexError", "ZeroDivisionError", "RuntimeError", "AssertionError", "ImportError", "OSError", "FileNotFoundError", "NameError", "AttributeError"]
+                },
+                {
+                    "name": "decorators",
+                    "weight": 0.3,
+                    "colour": [122, 162, 247],
+                    "words": ["@staticmethod", "@classmethod", "@property", "@dataclass", "@lru_cache", "@wraps", "@abstractmethod"]
+                },
+                {
+                    "name": "integers",
+                    "weight": 0.8,
+                    "colour": [255, 158, 100],
+                    "words": ["-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+                },
+                {
+                    "name": "strings",
+                    "weight": 0.5,
+                    "colour": [135, 240, 135],
+                    "words": ["\"hello\"", "\"world\"", "\"python\"", "\"screensaver\"", "\"example\"", "\"string\"", "\"foo\"", "\"bar\"", "\"baz\"", "\"quux\"", "\"test\"", "\"data\"", "\"code\"", "\"run\""]
+                },
+                {
+                    "name": "symbols",
+                    "weight": 0.4,
+                    "colour": [180, 255, 255],
+                    "words": ["(", ")", "[", "]", "{", "}", ",", ":", ".", "+", "-", "*", "**", "/", "//", "%", "=", "==", "!=", "<", ">", "<=", ">=", "->", "@", "&", "|", "^", "~", "<<", ">>"]
+                },
+                {
+                    "name": "kwargs",
+                    "weight": 0.3,
+                    "colour": [255, 215, 40],
+                    "words": ["*args", "**kwargs"]
+                },
+                {
+                    "name": "special_refs",
+                    "weight": 0.5,
+                    "colour": [255, 105, 180],
+                    "words": ["self", "cls", "__init__", "__name__", "__main__", "__str__", "__repr__", "__dict__"]
+                },
+                {
+                    "name": "modules",
+                    "weight": 0.4,
+                    "colour": [255, 170, 255],
+                    "words": [
+                        "os", "sys", "time", "random", "json", "re", "math", "datetime", "collections", "itertools", "functools", "pathlib", "threading", "asyncio", "requests", "numpy", "pandas", "pytest", "flask", "django"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "git",
+            "kw_groups": [
+                {
+                    "name": "commands",
+                    "weight": 1.0,
+                    "colour": [255, 255, 125],
+                    "words": ["commit", "push", "pull", "fetch", "checkout", "merge", "rebase", "branch", "stash", "clone", "reset", "revert", "tag", "diff", "log", "init", "remote"]
+                },
+                {
+                    "name": "actions",
+                    "weight": 0.9,
+                    "colour": [255, 150, 100],
+                    "words": ["add", "rm", "mv", "show", "status", "config", "apply", "cherry-pick", "bisect", "clean"]
+                },
+                {
+                    "name": "objects",
+                    "weight": 0.8,
+                    "colour": [150, 200, 255],
+                    "words": ["HEAD", "origin", "master", "main", "upstream", "blob", "tree", "commit", "index", "stash@{0}", "refs", "tags"]
+                },
+                {
+                    "name": "flags",
+                    "weight": 0.6,
+                    "colour": [255, 180, 255],
+                    "words": ["--amend", "--hard", "--soft", "--force", "--verbose", "--all", "--patch", "--stat", "--squash"]
+                },
+                {
+                    "name": "branches",
+                    "weight": 0.7,
+                    "colour": [180, 255, 180],
+                    "words": ["main", "develop", "feature", "bugfix", "release", "hotfix", "experiment", "testing"]
+                },
+                {
+                    "name": "remotes",
+                    "weight": 0.5,
+                    "colour": [255, 220, 140],
+                    "words": ["origin", "upstream", "fork", "deploy", "backup"]
+                }
+            ]
+        },
+        {
+            "name": "bash",
+            "kw_groups": [
+                {
+                    "name": "core_cmds",
+                    "weight": 1.0,
+                    "colour": [50, 255, 50],
+                    "words": ["ls", "cd", "pwd", "mkdir", "rm", "cp", "mv", "touch", "cat", "echo", "grep", "sed", "awk", "find", "chmod", "chown", "tar", "curl", "wget", "ping", "top", "kill", "ps", "df", "du"]
+                },
+                {
+                    "name": "logic",
+                    "weight": 0.8,
+                    "colour": [180, 115, 255],
+                    "words": ["if", "then", "else", "fi", "for", "while", "do", "done", "case", "esac", "match", "select", "until", "break", "continue", "return"]
+                },
+                {
+                    "name": "vars",
+                    "weight": 0.7,
+                    "colour": [100, 255, 255],
+                    "words": ["PATH", "HOME", "USER", "SHELL", "BASH_VERSION", "RANDOM", "$@", "$?", "$*", "$0", "$1", "$2", "$$", "$!"]
+                },
+                {
+                    "name": "processes",
+                    "weight": 0.6,
+                    "colour": [255, 180, 180],
+                    "words": ["&", "|", "&&", "||", ";", "()", "{}", "<", ">", ">>", "<<<", "read", "exec"]
+                },
+                {
+                    "name": "utilities",
+                    "weight": 0.5,
+                    "colour": [255, 255, 180],
+                    "words": ["diff", "cmp", "sort", "uniq", "cut", "head", "tail", "xargs", "tee", "split"]
+                },
+                {
+                    "name": "network",
+                    "weight": 0.4,
+                    "colour": [180, 255, 255],
+                    "words": ["ssh", "scp", "rsync", "ftp", "telnet", "netstat", "curl", "wget", "ping", "traceroute"]
+                }
+            ]
+        }
+    ]
 }

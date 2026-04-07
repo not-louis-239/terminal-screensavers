@@ -5,8 +5,10 @@ import shutil
 import random
 import time
 import termios
+import json
 from dataclasses import dataclass
 from typing import Literal
+from pathlib import Path
 
 from lib.utils import chance, clamp
 from lib.kb_input_manager import KBInputManager, Keys
@@ -20,8 +22,41 @@ START_TEMP = 20
 ABS_ZERO = -273.15
 MAX_TEMP = 150
 
-# TODO: load keyword packs for different words
-# TODO: allow changing theme
+@dataclass
+class KeywordGroup:
+    weight: float
+    colour: tuple[int, int, int]
+    words: list[str]
+
+@dataclass
+class KeywordPack:
+    name: str
+    kw_groups: list[KeywordGroup]
+
+# Load keyword packs
+def load_kw_packs() -> dict[str, KeywordPack]:
+    with open(Path(__file__).parent.parent / "data" / "kw_packs.json") as f:
+        kw_packs_raw = json.load(f)["kw_packs"]
+
+    kw_packs: dict[str, KeywordPack] = {}
+    
+    # FIXME: AttributeError: 'list' object has no attribute 'items'
+    for pack_name, pack_contents in kw_packs_raw.items():
+        kw_groups: list[KeywordGroup] = []
+        for group in pack_contents:
+            new = KeywordGroup(
+                weight=group["weight"],
+                colour=group["colour"],
+                words=group["words"]
+            )
+            kw_groups.append(new)
+
+        kw_packs[pack_name] = KeywordPack(
+            name=pack_name,
+            kw_groups=kw_groups
+        )
+
+    return kw_packs
 
 @dataclass
 class FlyingWord:
@@ -47,8 +82,14 @@ class FlyingWordsSim:
         self.temperature = START_TEMP
         self.flying_words: list[FlyingWord] = []
 
+        self.kw_packs = load_kw_packs()
+        self.current_kw_pack: int = 0
+
         w, h = shutil.get_terminal_size()
         self.buffer: list[list[str]] = [[" " for _ in range(w)] for _ in range(h)]
+
+    def cycle_kw_pack(self) -> None:
+        self.current_kw_pack = (self.current_kw_pack + 1) % len(self.kw_packs)
 
     def cull_offscreen_words(self, term_w: int) -> None:
         for flying_word in self.flying_words[:]:
