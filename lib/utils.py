@@ -1,6 +1,5 @@
 import random
 
-from lib.utils import lerp
 from lib.custom_types import Colour
 
 def chance(p: float, /) -> bool:
