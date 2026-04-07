@@ -1,4 +1,4 @@
-from lib.vector2 import IntVector2
+from lib.vectors import IntVector2
 from lib.colours import col, COL_RESET
 import shutil
 import time
@@ -31,13 +31,18 @@ class LangtonsAnt:
 
     def step(self, grid: EndlessGrid) -> None:
         # Implementation of the Langton's Ant algorithm here
+        assert isinstance(self.pos, IntVector2), "pos must be an IntVector2"
+        assert isinstance(grid, EndlessGrid), "grid must be an EndlessGrid"
 
         if grid.is_active(self.pos):
             self.facing -= 1  # turn left
             grid.active_lights.remove(self.pos)
         else:
+            new = self.pos.copy()
+            assert isinstance(new, IntVector2), "new must be an IntVector2"
+
             self.facing += 1  # turn right
-            grid.active_lights.add(self.pos.copy())
+            grid.active_lights.add(new)
 
         self.facing %= 4
         self.pos += DIRS[self.facing]
@@ -58,7 +63,7 @@ def run():
         visible_h = 2 * (term_h - 1)
         viewport_w, viewport_h = term_w, visible_h
 
-        start_x, start_y = ant.pos.x - viewport_w // 2, ant.pos.y - viewport_h // 2
+        start_x, start_y = int(ant.pos.x - viewport_w // 2), int(ant.pos.y - viewport_h // 2)
 
         buf = ""
 
