@@ -8,6 +8,9 @@ class Vector2:
         self.x = x
         self.y = y
 
+    def _is_zero(self) -> bool:
+        return self.x == 0 and self.y == 0
+
     # Arithmetic overloads
     def __add__(self, other: Vector2) -> Vector2:
         # Using type(self) ensures that if an IntVector2 adds something,
@@ -30,6 +33,11 @@ class Vector2:
             self.x * scalar,
             self.y * scalar
         )
+
+    def __truediv__(self, scalar: float) -> Vector2:
+        if scalar == 0:
+            raise ZeroDivisionError("Cannot divide a vector by zero")
+        return self * (1 / scalar)
 
     # Hashing, representation and copying
     def __hash__(self) -> int:
@@ -60,8 +68,17 @@ class Vector2:
     def dot(self, other: Vector2) -> float:
         return self.x * other.x + self.y * other.y
 
+    def normalise(self) -> Vector2:
+        length = self.length()
+        if length == 0:
+            raise ValueError("cannot normalise a zero vector")
+        return self / length
+
     def angle_to(self, other: Vector2) -> float:
         """Returns the angle to another Vector2 in radians"""
+
+        if self._is_zero() or other._is_zero():
+            raise ValueError("angle_to is undefined for zero vectors")
 
         dot = self.dot(other)
         cos_theta = dot / (self.length_sq() * other.length_sq()) ** 0.5
