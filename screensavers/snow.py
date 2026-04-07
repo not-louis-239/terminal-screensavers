@@ -2,23 +2,34 @@ import time
 import random
 import shutil
 
-from lib.vectors import Vector3
-from lib.utils import lerp_colours
+from lib.vectors import Vector3, clamp
+from lib.utils import lerp_colours, rgb_to_str
+from lib.colours import COL_RESET
 
 FPS = 60
 
-FALL_SPEED: float = 2  # chars/s
-WIND_STRENGTH: float = 1  # chars/s
-SNOW_SPAWN_RATE: float = 20
+FALL_SPEED: float = 10  # chars/s
+
+WIND_STRENGTH: float = 0.2  # chars/s  # DEBUG: cancelling wind for now to test basic snow movement
+WIND_CHANGE_TIME = 10
+
+SNOW_SPAWN_RATE: float = 12
 MAX_SNOWFLAKE_DISTANCE: float = 10
+MIN_SNOWFLAKE_DISTANCE: float = 1
+SNOWFLAKE_CHARS = "*.·+"
+
+PARALLAX_FRONT_COLOUR = (153, 255, 255)
+PARALLAX_BACK_COLOUR = (91, 91, 128)
 
 class Snowflake:
-    def __init__(self, x: float, y: float, z: float) -> None:
+    def __init__(self, x: float, y: float, z: float, char: str) -> None:
         self.pos = Vector3(x, y, z)
+        self.char = char
 
     def update(self, dt_s: float, lateral_wind_rate: Vector3) -> None:
         self.pos.y += FALL_SPEED * dt_s
         self.pos += lateral_wind_rate * dt_s
+        self.pos.z = clamp(self.pos.z, (MIN_SNOWFLAKE_DISTANCE, MAX_SNOWFLAKE_DISTANCE))
 
     def get_viewport_pos(self, vp_w: int, vp_h: int) -> tuple[float, float]:
         """Assuming (0, 0) is top-centre of viewport and +self.pos.y = downwards"""
@@ -35,9 +46,6 @@ class Snowflake:
         return (0 <= vp_x < vp_w) and (0 <= vp_y < vp_h)
 
 class SnowflakesSim:
-    WIND_CHANGE_TIME = 10
-    MAX_SNOWFLAKE_DISTANCE = 10
-
     def __init__(self) -> None:
         self.snowflakes: list[Snowflake] = []
 
@@ -49,23 +57,23 @@ class SnowflakesSim:
         return Vector3(random.uniform(-WIND_STRENGTH, WIND_STRENGTH), 0, random.uniform(-WIND_STRENGTH, WIND_STRENGTH))
 
     def get_current_wind(self) -> Vector3:
-        return self._wind_old.lerp(self._wind_new, self.t_wind / self.WIND_CHANGE_TIME)
+        return self._wind_old.lerp(self._wind_new, self.t_wind / WIND_CHANGE_TIME)
 
     def spawn_snowflake(self, vp_w: float) -> None:
-        z = random.uniform(1, MAX_SNOWFLAKE_DISTANCE)
+        z = random.uniform(MIN_SNOWFLAKE_DISTANCE, MAX_SNOWFLAKE_DISTANCE)
         y = 0
 
         half_vp_w = vp_w / 2
         x = random.uniform(-half_vp_w * z, half_vp_w * z)
 
-        self.snowflakes.append(Snowflake(x, y, z))
+        self.snowflakes.append(Snowflake(x, y, z, random.choice(SNOWFLAKE_CHARS)))
 
     def update(self, dt_s: float, vp_w: int, vp_h: int) -> None:
         if random.random() < SNOW_SPAWN_RATE * dt_s:
             self.spawn_snowflake(vp_w)
 
         self.t_wind += dt_s
-        if self.t_wind >= self.WIND_CHANGE_TIME:
+        if self.t_wind >= WIND_CHANGE_TIME:
             self.t_wind = 0
             self._wind_old = self._wind_new
             self._wind_new = self._generate_wind_dir()
@@ -76,7 +84,7 @@ class SnowflakesSim:
             snowflake.update(dt_s, wind)
 
             # Allow flakes to exist slightly outside the bounds before killing them
-            vp_x, vp_y = snowflake.get_viewport_pos(vp_w, vp_h)
+            _, vp_y = snowflake.get_viewport_pos(vp_w, vp_h)
             if vp_y > vp_h or snowflake.pos.z < 0.1: # Kill if below screen or behind camera
                 self.snowflakes.remove(snowflake)
 
@@ -93,7 +101,10 @@ class SnowflakesSim:
             visual_x, visual_y = int(visual_x), int(visual_y)
 
             if 0 <= visual_x < vp_w and 0 <= visual_y < vp_h:
-                buf[visual_y][visual_x] = "*"
+                frac = (sf.pos.z - MIN_SNOWFLAKE_DISTANCE) / (MAX_SNOWFLAKE_DISTANCE - MIN_SNOWFLAKE_DISTANCE)
+                colour = lerp_colours(PARALLAX_FRONT_COLOUR, PARALLAX_BACK_COLOUR, frac)
+
+                buf[visual_y][visual_x] = f"{rgb_to_str(colour)}{sf.char}{COL_RESET}"
 
         print("\n".join(["".join(row) for row in buf]))
 

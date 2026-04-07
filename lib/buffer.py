@@ -2,16 +2,13 @@ from __future__ import annotations
 
 from .custom_types import Colour
 from .colours import COL_RESET
+from .utils import rgb_to_str
 
 class Buffer:
     _BLACK: Colour = (0, 0, 0)
 
     def __init__(self, width: int, height: int) -> None:
         self.pixels: list[list[Colour]] = [[self._BLACK for _ in range(width)] for _ in range(height)]
-
-    def _rgb_to_str(self, colour: Colour, /, *, bg: bool = False) -> str:
-        r, g, b = colour
-        return f"\033[{48 if bg else 38};2;{r};{g};{b}m"
 
     def get_width(self) -> int:
         return len(self.pixels[0])
@@ -105,9 +102,9 @@ class Buffer:
 
                 if y + 1 < height:  # bottom row in-bounds
                     bottom_col = self.get_pix(x, y + 1)
-                    char = f"{self._rgb_to_str(top_col)}{self._rgb_to_str(bottom_col, bg=True)}▀{COL_RESET}"
+                    char = f"{rgb_to_str(top_col)}{rgb_to_str(bottom_col, bg=True)}▀{COL_RESET}"
                 else:  # bottom row out of bounds
-                    char = f"{self._rgb_to_str(top_col)}▀{COL_RESET}"
+                    char = f"{rgb_to_str(top_col)}▀{COL_RESET}"
 
                 row.append(char)
             rendered_rows.append(row)
