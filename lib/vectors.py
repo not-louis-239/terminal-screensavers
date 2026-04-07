@@ -86,6 +86,51 @@ class Vector2:
         # Using length_sq then square-rooting once is more efficient
         return acos(clamp(cos_theta, (-1, 1)))  # clamping ensures that floating-point errors don't crash the script, e.g. 1.0000000001
 
+class Vector3:
+    def __init__(self, x: float = 0, y: float = 0, z: float = 0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def _is_zero(self) -> bool:
+        return self.x == 0 and self.y == 0 and self.z == 0
+
+    def __add__(self, other: Vector3) -> Vector3:
+        return Vector3(
+            self.x + other.x,
+            self.y + other.y,
+            self.z + other.z
+        )
+
+    def __sub__(self, other: Vector3) -> Vector3:
+        return Vector3(
+            self.x - other.x,
+            self.y - other.y,
+            self.z - other.z
+        )
+
+    def __mul__(self, scalar: float) -> Vector3:
+        return Vector3(
+            self.x * scalar,
+            self.y * scalar,
+            self.z * scalar
+        )
+
+    def __truediv__(self, scalar: float) -> Vector3:
+        return self * (1 / scalar)
+
+    def __neg__(self) -> Vector3:
+        return Vector3(-self.x, -self.y, -self.z)
+
+    def length_sq(self) -> float:
+        return (self.x ** 2 + self.y ** 2 + self.z ** 2)
+
+    def length(self) -> float:
+        return self.length_sq() ** 0.5
+
+    def normalise(self) -> Vector3:
+        return self / self.length()
+
 class IntVector2(Vector2):
     def __init__(self, x: int = 0, y: int = 0) -> None:
         # Force cast to int to maintain "Integer Semantics"
