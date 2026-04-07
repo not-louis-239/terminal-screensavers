@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Serpent Themes Schema",
+    "type": "object",
+    "required": ["themes"],
+    "properties": {
+        "themes": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "required": ["body_colours"],
+                "properties": {
+                    "body_colours": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 255
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,5 @@
 {
+    "$schema": "./serpent_themes.schema.json",
     "themes": {
         "Classic Green": {
             "body_colours": [[255, 255, 128], [0, 192, 128]]
