@@ -1,7 +1,7 @@
 from __future__ import annotations
 from math import acos
 
-from .utils import clamp
+from .utils import clamp, lerp
 
 class Vector2:
     def __init__(self, x: float = 0, y: float = 0) -> None:
@@ -130,6 +130,13 @@ class Vector3:
 
     def normalise(self) -> Vector3:
         return self / self.length()
+
+    def lerp(self, other: Vector3, t: float) -> Vector3:
+        return Vector3(
+            lerp(self.x, other.x, t),
+            lerp(self.y, other.y, t),
+            lerp(self.z, other.z, t)
+        )
 
 class IntVector2(Vector2):
     def __init__(self, x: int = 0, y: int = 0) -> None:

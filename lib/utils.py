@@ -1,5 +1,8 @@
 import random
 
+from lib.utils import lerp
+from lib.custom_types import Colour
+
 def chance(p: float, /) -> bool:
     """Usage:
 
@@ -16,3 +19,10 @@ def clamp(v: float, clamp_range: tuple[float, float], /) -> float:
 
 def lerp(a: float, b: float, t: float) -> float:
     return a + (b - a) * t
+
+def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
+    return (
+        int(lerp(c1[0], c2[0], t)),
+        int(lerp(c1[1], c2[1], t)),
+        int(lerp(c1[2], c2[2], t))
+    )
