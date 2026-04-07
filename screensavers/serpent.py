@@ -1,29 +1,68 @@
 import random
 
-from math import sin, cos
 import time
 import shutil
 import math
+import json
+from math import sin, cos
+from dataclasses import dataclass
+from pathlib import Path
 
 from lib.buffer import Buffer
 from lib.vectors import Vector2
+from lib.custom_types import Colour
+from lib.utils import lerp
+from lib.kb_input_manager import KBInputManager, Keys
 
-MOVEMENT_SPEED = 5  # units per second
-TURN_SPEED = 60  # radians/s max
+MOVEMENT_SPEED = 80  # units per second
+TURN_SPEED = 1.8  # radians/s max
 FPS = 60
 
+@dataclass
+class SerpentTheme:
+    name: str
+    body_colours: list[Colour]
+
+def load_themes() -> list[SerpentTheme]:
+    themes = []
+
+    with open(Path(__file__).resolve().parent.parent / "data" / "serpent_themes.json", "r", encoding="utf-8") as f:
+        themes_raw = json.load(f)["themes"]
+
+    for name, theme in themes_raw.items():
+        themes.append(SerpentTheme(name, theme["body_colours"]))
+
+    return themes
+
+def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
+    return (
+        int(lerp(c1[0], c2[0], t)),
+        int(lerp(c1[1], c2[1], t)),
+        int(lerp(c1[2], c2[2], t))
+    )
+
+def get_colour_from_gradient(colors: list[Colour], t: float):
+    if len(colors) == 1: return colors[0]
+
+    # Scale t to the number of segments in the gradient
+    scaled_t = t * (len(colors) - 1)
+    index = int(scaled_t)
+    local_t = scaled_t - index
+
+    if index >= len(colors) - 1:
+        return colors[-1]
+
+    return lerp_colours(colors[index], colors[index + 1], local_t)
+
 class Serpent:
-    def __init__(
-            self, length: int, head_x: int, head_y: int,
-            head_colour: tuple[int, int, int], tail_colour: tuple[int, int, int]
-        ) -> None:
+    def __init__(self, length: int, head_x: float, head_y: float,) -> None:
         self.head = Vector2(head_x, head_y)
-        self.heading: float = 0  # radians
+
+        self.heading: float = random.uniform(0, 2 * math.pi)  # radians
+        self.turn_velocity: float = 0
+
         self.length = length
         self.trails: list[Vector2] = []
-
-        self.head_colour = head_colour
-        self.tail_colour = tail_colour
 
     def move(self, dt_s: float, vp_w: int, vp_h: int) -> None:
         # Calculate the unit vector for the serpent's current heading
@@ -47,36 +86,67 @@ class Serpent:
         self.head.y %= vp_h
 
         # Make the serpent turn randomly
-        self.heading += random.uniform(-TURN_SPEED, TURN_SPEED)
-        self.heading %= 2 * math.pi * dt_s
+        noise = random.uniform(-1, 1)
+
+        self.turn_velocity += noise * TURN_SPEED * dt_s
+        self.turn_velocity *= 0.95  # damping
+
+        self.heading += self.turn_velocity
+        self.heading %= 2 * math.pi
 
 def run():
-    head_colour = (255, 255, 128)
-    tail_colour = (0, 192, 128)
+    # TODO: add themes which can be cycled by pressing Space
 
-    buffer = Buffer(*shutil.get_terminal_size())
-    serpent = Serpent(200, 10, 10, head_colour, tail_colour)
+    themes = load_themes()
+    theme_idx = 0
+
+    term_w, term_h = shutil.get_terminal_size()
+    buffer = Buffer(term_w, term_h)
+    serpent = Serpent(320, random.uniform(0, term_w), random.uniform(0, term_h))
+    kb = KBInputManager()
 
     while True:
+        kb.update()
+
         term_w, term_h = shutil.get_terminal_size()
         vis_w, vis_h = term_w, 2 * (term_h - 1)
 
         serpent.move(1 / FPS, vis_w, vis_h)
 
+        # Change serpent theme by pressing Space
+        if kb.went_down(Keys.SPACE):
+            theme_idx += 1
+            theme_idx %= len(themes)
+
         # Resize buffer if terminal size changed since last frame
         if (vis_w, vis_h) != buffer.get_size():
             buffer.resize_and_clear(vis_w, vis_h)
 
+        t = time.time() * 5  # speed of shimmer effect
+
         # Draw the serpent to the buffer
         buffer.clear()
-        for segment in serpent.trails:
-            buffer.set_pix(int(segment.x), int(segment.y), tail_colour)
-        buffer.set_pix(int(serpent.head.x), int(serpent.head.y), head_colour)
+
+        current_theme = themes[theme_idx]
+        body_colours = current_theme.body_colours
+
+        for i, segment in enumerate(serpent.trails):
+            frac = i / len(serpent.trails)  # 0 = tail, 1 = head
+
+            shimmer = math.sin(t - i * 0.2) * 40
+            base_colour = get_colour_from_gradient(body_colours, 1 - frac)  # XXX: I don't know why I have to do 1 - frac, I'll figure it out later
+            final_colour = tuple(max(0, min(255, int(c + shimmer))) for c in base_colour)
+            assert len(final_colour) == 3
+
+            buffer.draw_circle((int(segment.x), int(segment.y)), 1 + 1.2 * frac, final_colour)
+        buffer.draw_circle((int(serpent.head.x), int(serpent.head.y)), 2.6, body_colours[0])
 
         # Clear screen and draw the buffer
-        print("\033[H\033[J", end='', flush=True)
+        print("\033[H", end='', flush=True)  # avoid \033[J as it causes unnecessary flicker
         print(buffer.render())
-        print("Press Ctrl-C to exit.", end='', flush=True)
+
+        hud_text = f"Theme: {current_theme.name}"
+        print(f"{hud_text:<24} | Press Ctrl-C to exit.", end='', flush=True)
 
         time.sleep(1 / FPS)
 

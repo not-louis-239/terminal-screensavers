@@ -39,7 +39,7 @@ def load_kw_packs() -> dict[str, KeywordPack]:
         kw_packs_raw = json.load(f)["kw_packs"]
 
     kw_packs: dict[str, KeywordPack] = {}
-    
+
     # FIXME: AttributeError: 'list' object has no attribute 'items'
     for pack_name, pack_contents in kw_packs_raw.items():
         kw_groups: list[KeywordGroup] = []
@@ -128,9 +128,9 @@ class FlyingWordsSim:
 
     def take_input(self, dt_s: float) -> None:
         # Change temperature at 80°C/s depending on key pressed
-        if self.kb.is_pressed(Keys.W):
+        if self.kb.is_down(Keys.W):
             self.temperature += 80 * dt_s
-        if self.kb.is_pressed(Keys.S):
+        if self.kb.is_down(Keys.S):
             self.temperature -= 80 * dt_s
 
         self.temperature = max(self.temperature, ABS_ZERO)

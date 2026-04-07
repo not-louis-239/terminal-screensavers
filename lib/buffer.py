@@ -72,6 +72,21 @@ class Buffer:
                 err += dx
                 y0 += sy
 
+    def draw_rect(self, x: int, y: int, w: int, h: int, colour: Colour) -> None:
+        for ix in range(x, x + w):
+            for iy in range(y, y + h):
+                self.set_pix(ix, iy, colour)
+
+    def draw_circle(self, centre: tuple[int, int], r: float, colour: Colour) -> None:
+        cx, cy = centre
+
+        r_sq = r**2
+        for y in range(int(cy - r), int(cy + r) + 1, 1):
+            for x in range(int(cx - r), int(cx + r) + 1, 1):
+                dx, dy = x - cx, y - cy
+                if dx*dx + dy*dy <= r_sq:
+                    self.set_pix(x, y, colour)
+
     def __repr__(self) -> str:
         return f"Buffer(width={self.get_width()}, height={self.get_height()})"
 

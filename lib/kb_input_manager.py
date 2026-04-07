@@ -35,24 +35,39 @@ class KBInputManager:
     def __init__(self) -> None:
         # Use a set to automatically handle duplicates from key-repeat
         self.pressed_keys: set[str] = set()
+        self.previous_keys: set[str] = set()
 
-        self.listener = keyboard.Listener(
-            on_press=self.on_press,
-            on_release=self.on_release
-        )
+        # New: Track what happened specifically since the last update
+        self._just_pressed: set[str] = set()
+        self._just_released: set[str] = set()
+
+        self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
 
+    def update(self) -> None:
+        """Snapshots the state and clears the event buffers."""
+        self.previous_keys = self.pressed_keys.copy()
+        # Clear the 'just' buffers every frame after the logic has had a chance to read them
+        self._last_pressed = self._just_pressed.copy()
+        self._last_released = self._just_released.copy()
+        self._just_pressed.clear()
+        self._just_released.clear()
+
     def on_press(self, key):
-        # XXX: .lower() ignores shift for simplicity
         k = self._get_key_str(key)
-        if k is not None:
-            self.pressed_keys.add(k.lower())
+        if k:
+            k = k.lower()
+            if k not in self.pressed_keys:
+                self._just_pressed.add(k) # Record the event
+            self.pressed_keys.add(k)
 
     def on_release(self, key):
-        # XXX: .lower() ignores shift for simplicity
         k = self._get_key_str(key)
-        if k in self.pressed_keys:
-            self.pressed_keys.remove(k.lower())
+        if k:
+            k = k.lower()
+            if k in self.pressed_keys:
+                self._just_released.add(k) # Record the event
+                self.pressed_keys.remove(k)
 
     def _get_key_str(self, key) -> str | None:
         """Helper to normalize character keys and special keys."""
@@ -69,8 +84,14 @@ class KBInputManager:
         # Fallback for other keys
         return str(key).replace("Key.", "")
 
-    def is_pressed(self, key: Keys) -> bool:
-        return key in self.pressed_keys
+    def is_down(self, key: str) -> bool:
+        return key.lower() in self.pressed_keys
+
+    def went_down(self, key: str) -> bool:
+        return key.lower() in self._last_pressed
+
+    def went_up(self, key: str) -> bool:
+        return key.lower() in self._last_released
 
 class Keys(StrEnum):
     # Letters
@@ -128,10 +149,17 @@ def _test_kb():
 
     try:
         while True:
-            if kb.is_pressed(Keys.k0):
+            kb.update()
+
+            if kb.is_down(Keys.k0):
                 print("Key 0 is pressed")
-            elif kb.is_pressed(Keys.k1):
+            if kb.is_down(Keys.k1):
                 print("Key 1 is pressed")
+            if kb.went_down(Keys.k2):
+                print("Key 2 went down")
+            if kb.went_up(Keys.k3):
+                print("Key 3 went up")
+
             time.sleep(0.01)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt received. Exiting now.")
