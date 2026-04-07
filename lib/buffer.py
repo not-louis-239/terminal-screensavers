@@ -19,6 +19,9 @@ class Buffer:
     def get_height(self) -> int:
         return len(self.pixels)
 
+    def get_size(self) -> tuple[int, int]:
+        return (self.get_width(), self.get_height())
+
     def fill(self, colour: Colour) -> None:
         self.pixels = [[colour for _ in range(self.get_width())] for _ in range(self.get_height())]
 
@@ -69,12 +72,15 @@ class Buffer:
                 err += dx
                 y0 += sy
 
-    def __str__(self) -> str:
-        grid: list[list[str]] = []
+    def __repr__(self) -> str:
+        return f"Buffer(width={self.get_width()}, height={self.get_height()})"
+
+    def render(self) -> str:
+        rendered_rows: list[list[str]] = []
         width, height = self.get_width(), self.get_height()
 
         for y in range(0, height, 2):
-            cells = []
+            row: list[str] = []
             for x in range(0, width):
                 top_col = self.get_pix(x, y)
 
@@ -88,7 +94,7 @@ class Buffer:
                 else:  # bottom row out of bounds
                     char = f"{self._rgb_to_str(top_col)}▀{COL_RESET}"
 
-                cells.append(char)
-            grid.append(cells)
+                row.append(char)
+            rendered_rows.append(row)
 
-        return "\n".join(["".join(row) for row in grid])
+        return "\n".join(["".join(row) for row in rendered_rows])
