@@ -10,7 +10,9 @@ from dataclasses import dataclass
 from typing import Literal
 from pathlib import Path
 
-from lib.utils import chance, clamp
+from lib.custom_types import Colour, T
+from lib.utils import chance, rgb_to_str, lerp_colours
+from lib.colours import COL_RESET
 from lib.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
@@ -21,6 +23,9 @@ MAX_SPEED = 50
 START_TEMP = 20
 ABS_ZERO = -273.15
 MAX_TEMP = 150
+
+ABS_ZERO_COLOUR = (60, 60, 60)
+MAX_TEMP_COLOUR = (255, 255, 255)
 
 @dataclass
 class KeywordGroup:
@@ -34,15 +39,21 @@ class KeywordPack:
     kw_groups: list[KeywordGroup]
 
 # Load keyword packs
-def load_kw_packs() -> dict[str, KeywordPack]:
+def load_kw_packs() -> list[KeywordPack]:
     with open(Path(__file__).parent.parent / "data" / "kw_packs.json") as f:
         kw_packs_raw = json.load(f)["kw_packs"]
+        print(kw_packs_raw)
 
-    kw_packs: dict[str, KeywordPack] = {}
+    kw_packs: list[KeywordPack] = []
 
-    # FIXME: AttributeError: 'list' object has no attribute 'items'
-    for pack_name, pack_contents in kw_packs_raw.items():
+    for pack in kw_packs_raw:
+        pack_name = pack["name"]
+        pack_contents = pack["kw_groups"]
+
+        assert isinstance(pack_name, str)
+
         kw_groups: list[KeywordGroup] = []
+
         for group in pack_contents:
             new = KeywordGroup(
                 weight=group["weight"],
@@ -51,12 +62,29 @@ def load_kw_packs() -> dict[str, KeywordPack]:
             )
             kw_groups.append(new)
 
-        kw_packs[pack_name] = KeywordPack(
+        kw_packs.append(KeywordPack(
             name=pack_name,
             kw_groups=kw_groups
-        )
+        ))
 
     return kw_packs
+
+import random
+
+def pick_opt_from_weighted_table(table: list[tuple[T, float]]) -> T:
+    if not table:
+        raise ValueError("Table is empty")
+
+    # zip(*table) unpacks the tuples into two separate iterables
+    objs, weights = zip(*table)
+
+    if sum(weights) == 0:
+        raise ValueError("Total of weights cannot be zero")
+    if any((bad_weight := weight) < 0 for weight in weights):
+        raise ValueError(f"No weight can be negative. Got {bad_weight}")
+
+    # random.choices returns a list, so we take the first element [0]
+    return random.choices(objs, weights=weights, k=1)[0]
 
 @dataclass
 class FlyingWord:
@@ -78,6 +106,7 @@ class FlyingWord:
 class FlyingWordsSim:
     def __init__(self) -> None:
         self.kb = KBInputManager()
+        self.current_kw_pack_idx: int = 0
 
         self.temperature = START_TEMP
         self.flying_words: list[FlyingWord] = []
@@ -87,6 +116,33 @@ class FlyingWordsSim:
 
         w, h = shutil.get_terminal_size()
         self.buffer: list[list[str]] = [[" " for _ in range(w)] for _ in range(h)]
+
+    def _pick_word_and_colour(self, kw_pack: KeywordPack) -> tuple[str, Colour]:
+        if not kw_pack.kw_groups:
+            raise ValueError("KeywordPack has no groups")
+
+        # Build the weighted table: [(KeywordGroup, weight), ...]
+        weighted_table = [(group, group.weight) for group in kw_pack.kw_groups]
+
+        # 2. Pick the winning group
+        chosen_group = pick_opt_from_weighted_table(weighted_table)
+
+        # 3. Pick a random word from the chosen group
+        # (Assuming words in a group are equally likely)
+        chosen_word = random.choice(chosen_group.words)
+
+        return chosen_word, chosen_group.colour
+
+    def _adjust_colour_on_temp(self, base_colour: Colour) -> Colour:
+        frac_of_normal = (self.temperature - ABS_ZERO) / (START_TEMP - ABS_ZERO)
+
+        if frac_of_normal >= 1:
+            # Hot
+            heat_intensity = (self.temperature - START_TEMP) / (MAX_TEMP - START_TEMP)
+            return lerp_colours(base_colour, MAX_TEMP_COLOUR, heat_intensity)
+        else:
+            # Cold
+            return lerp_colours(ABS_ZERO_COLOUR, base_colour, frac_of_normal)
 
     def cycle_kw_pack(self) -> None:
         self.current_kw_pack = (self.current_kw_pack + 1) % len(self.kw_packs)
@@ -107,26 +163,33 @@ class FlyingWordsSim:
         if not unoccupied_rows:
             return
 
-        text = "hello"
+        word, colour = self._pick_word_and_colour(self.kw_packs[self.current_kw_pack_idx])
         direction = random.choice((-1, 1))
 
         if direction == -1:
             start_x = viewport_w
         else:
-            start_x = -len(text)
+            start_x = -len(word)
 
         new = FlyingWord(
             x=start_x,
             y=random.choice(list(unoccupied_rows)),
-            text=text,
+            text=word,
             base_speed=random.uniform(MIN_SPEED, MAX_SPEED),
             direction=direction,
-            colour=(255, 255, 255)
+            colour=colour
         )
 
         self.flying_words.append(new)
 
     def take_input(self, dt_s: float) -> None:
+        if self.kb.went_down(Keys.SPACE):
+            self.current_kw_pack_idx += 1
+            self.current_kw_pack_idx %= len(self.kw_packs)
+
+            # Clear the flying words on screen when changing theme
+            self.flying_words.clear()
+
         # Change temperature at 80°C/s depending on key pressed
         if self.kb.is_down(Keys.W):
             self.temperature += 80 * dt_s
@@ -136,6 +199,8 @@ class FlyingWordsSim:
         self.temperature = max(self.temperature, ABS_ZERO)
 
     def update(self, *, viewport_w: int, viewport_h: int) -> None:
+        self.kb.update()  # VERY IMPORTANT!
+
         if chance(SPAWN_CHANCE):
             self.spawn_flying_word(viewport_w=viewport_w, viewport_h=viewport_h)
 
@@ -155,13 +220,14 @@ class FlyingWordsSim:
                     self.buffer[y][x] = " "
 
         for flying_word in self.flying_words[:]:  # Create a shallow copy of the list to avoid modify-while-iterating bugs
+            colour_str = rgb_to_str(self._adjust_colour_on_temp(flying_word.colour))
             for i, char in enumerate(flying_word.text):
                 x, y = int(flying_word.x + i), flying_word.y
 
                 if not 0 <= x < viewport_w or not 0 <= y < viewport_h:
                     continue
 
-                self.buffer[y][x] = char
+                self.buffer[y][x] = f"{colour_str}{char}{COL_RESET}"
 
         print("\n".join(["".join(row) for row in self.buffer]), flush=True)
 
@@ -174,17 +240,31 @@ def run():
 
         visible_h = th - 1
 
-        sim.take_input(1 / FPS)
         sim.update(viewport_w=tw, viewport_h=visible_h)
+        sim.take_input(1 / FPS)
 
         if sim.temperature > MAX_TEMP:
             # Print a fake traceback before exiting
             print("\033[H\033[J", end='')
             traceback = (
-                "Traceback (most recent call last)",
-                "  File \"main.py\", line 123, in update",
-                "    raise RuntimeError('system meltdown')",
-                "RuntimeError: system meltdown"
+                "Traceback (most recent call last):",
+                "  File \"main.py\", line 442, in <module>",
+                "    sim.run()",
+                "  File \"core/engine.py\", line 89, in run",
+                "    self.update_physics(dt)",
+                "  File \"core/physics.py\", line 156, in update_physics",
+                "    self.processor.compute_thermal_load()",
+                "  File \"hardware/drivers/cpu.py\", line 12, in compute_thermal_load",
+                "    return __thermal_interface__.get_die_temp(core_id=0)",
+                "  File \"hardware/drivers/thermal.py\", line 204, in get_die_temp",
+                "    raise HardwareCriticalError(f\"Sensor overflow at {hex(id(self))}\")",
+                "errors.HardwareCriticalError: Sensor overflow at 0x00007FFD2E41B090",
+                "",
+                "--- [ SYSTEM HALT: THERMAL_PROTECTION_FAULT ] ---",
+                "Reason: Temperature exceeded MAX_TEMP threshold.",
+                f"CPU_CORE_0: {sim.temperature:.1f}°C (CRITICAL)",
+                "VOLTAGE_REG: FAILURE",
+                "KERNEL_STATE: DUMPING MEMORY...",
             )
 
             print("\n".join(traceback) + "\n")
@@ -197,8 +277,8 @@ def run():
 
         sim.draw(viewport_w=tw, viewport_h=visible_h)
 
-        hud_text = f"Temp: {sim.temperature:.1f}°C"
-        print(f"{hud_text:<24} | Press Ctrl-C to exit.", flush=True)
+        hud_text = f"{f"Temp: {sim.temperature:.1f}°C":<15} | {f"Theme: {sim.kw_packs[sim.current_kw_pack_idx].name.title()}":<15}"
+        print(f"{hud_text:<32} | Press Ctrl-C to exit.", flush=True)
 
         time.sleep(1 / FPS)
         termios.tcflush(sys.stdin, termios.TCIFLUSH)

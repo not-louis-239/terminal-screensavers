@@ -44,6 +44,9 @@ class KBInputManager:
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
 
+        # Update once to avoid AttributeErrors from missing attrs
+        self.update()
+
     def update(self) -> None:
         """Snapshots the state and clears the event buffers."""
         self.previous_keys = self.pressed_keys.copy()
@@ -85,12 +88,15 @@ class KBInputManager:
         return str(key).replace("Key.", "")
 
     def is_down(self, key: str) -> bool:
+        """Return True while the key is held"""
         return key.lower() in self.pressed_keys
 
     def went_down(self, key: str) -> bool:
+        """Return True once on the first frame the key is pressed down"""
         return key.lower() in self._last_pressed
 
     def went_up(self, key: str) -> bool:
+        """Return True once on the first frame the key is released"""
         return key.lower() in self._last_released
 
 class Keys(StrEnum):
@@ -151,6 +157,8 @@ def _test_kb():
         while True:
             kb.update()
 
+            if kb.went_down(Keys.SPACE):
+                print("Space went down")
             if kb.is_down(Keys.k0):
                 print("Key 0 is pressed")
             if kb.is_down(Keys.k1):
