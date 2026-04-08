@@ -64,6 +64,7 @@ class MountainRange:
         self.parallax = parallax  # 1 = base movement speed, higher values suppress horizontal movement
         # This makes mountains that are further away appear to move slower
 
+        # Cached dictionary of objective heights (not influenced by parallax)
         self.heights: dict[int, float] = {}
 
     def get_height_at(self, x: float) -> float:
@@ -110,9 +111,9 @@ class Simulation:
         self.car_speed = STARTING_CAR_SPEED
 
         self.mountain_ranges: list[MountainRange] = [
-            MountainRange(y=GROUND_HEIGHT + 8, colour=(122, 101, 86), variance=5, scale=0.05, parallax=1.2),
-            MountainRange(y=GROUND_HEIGHT + 15, colour=(145, 133, 125), variance=4, scale=0.05, parallax=1.4),
-            MountainRange(y=GROUND_HEIGHT + 21, colour=(191, 186, 182), variance=3, scale=0.05, parallax=1.6)
+            MountainRange(y=GROUND_HEIGHT + 8, colour=(122, 101, 86), variance=5, scale=0.05, parallax=1.4),
+            MountainRange(y=GROUND_HEIGHT + 15, colour=(145, 133, 125), variance=4, scale=0.05, parallax=1.8),
+            MountainRange(y=GROUND_HEIGHT + 21, colour=(191, 186, 182), variance=3, scale=0.05, parallax=2.3)
         ]
 
         # sort by y-coordinate in descending order so that the lowest ones are drawn last
@@ -156,10 +157,11 @@ class Simulation:
         # Draw mountains before ground so that they appear behind the ground
         start_displacement = int(self.displacement)
         end_displacement = start_displacement + buf_width
+
         for mountain_range in self.mountain_ranges:
-            for x in range(int(start_displacement), end_displacement):
-                h = mountain_range.get_height_at(x)
-                self.buf.draw_rect(x - start_displacement, int(buf_height - h), 1, int(h), mountain_range.colour)
+            for screen_x in range(buf_width):
+                h = mountain_range.get_height_at(screen_x + self.displacement / mountain_range.parallax)
+                self.buf.draw_rect(screen_x, int(buf_height - h), 1, int(h), mountain_range.colour)
 
         # Draw ground and road
         for y in range(buf_height):
