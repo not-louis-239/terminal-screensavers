@@ -13,6 +13,7 @@ from pathlib import Path
 from lib.custom_types import Colour, T
 from lib.utils import chance, rgb_to_str, lerp_colours
 from lib.colours import COL_RESET
+from lib.dirs import DIRS
 from lib.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
@@ -40,7 +41,7 @@ class KeywordPack:
 
 # Load keyword packs
 def load_kw_packs() -> list[KeywordPack]:
-    with open(Path(__file__).parent.parent / "data" / "kw_packs.json") as f:
+    with open((DIRS.assets.json.kw_packs / "kw_packs.json").path(), "r") as f:
         kw_packs_raw = json.load(f)["kw_packs"]
         print(kw_packs_raw)
 

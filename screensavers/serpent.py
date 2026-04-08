@@ -12,6 +12,7 @@ from lib.buffer import Buffer
 from lib.vectors import Vector2
 from lib.custom_types import Colour
 from lib.utils import lerp_colours
+from lib.dirs import DIRS
 from lib.kb_input_manager import KBInputManager, Keys
 
 MOVEMENT_SPEED = 80  # units per second
@@ -26,7 +27,7 @@ class SerpentTheme:
 def load_themes() -> list[SerpentTheme]:
     themes = []
 
-    with open(Path(__file__).resolve().parent.parent / "data" / "serpent_themes.json", "r", encoding="utf-8") as f:
+    with open((DIRS.assets.json.serpent_themes / "serpent_themes.json").path(), "r", encoding="utf-8") as f:
         themes_raw = json.load(f)["themes"]
 
     for name, theme in themes_raw.items():

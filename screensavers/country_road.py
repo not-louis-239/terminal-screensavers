@@ -7,14 +7,15 @@ Experience a road trip, right from your terminal!
 import time
 import shutil
 import random
-from pathlib import Path
 
 from noise import snoise2
 
+from lib.dirs import DIRS
 from lib.custom_types import Colour
 from lib.colours import COL_RESET
 from lib.buffer import Buffer
 from lib.utils import lerp_colours, clamp, chance
+from lib.dirs import DIRS
 from lib.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
@@ -106,7 +107,7 @@ class Simulation:
         self.buf = Buffer(tw, 2 * (th - 1))
         self.kb = KBInputManager()
 
-        self.car = Car(15, GROUND_HEIGHT + 1, Buffer.load_from_img(Path(__file__).parent.parent / "data" / "car.png"))
+        self.car = Car(15, GROUND_HEIGHT + 1, Buffer.load_from_img((DIRS.assets.images / "car.png").path()))
         self.displacement = 0
         self.car_speed = STARTING_CAR_SPEED
 
@@ -209,7 +210,7 @@ from datetime import datetime
 
 def make_speeding_fine(speed_kmh: float, limit_kmh: float) -> str:
     # Load the template
-    with open(Path(__file__).parent.parent / "data" / "speeding_fine.txt", "r") as f:
+    with open((DIRS.assets / "texts" / "speeding_fine.txt").path(), "r") as f:
         # Filter out lines starting with '#'
         template = "".join(line for line in f if not line.strip().startswith("#"))  # allow comments to be ignored
 
@@ -254,9 +255,6 @@ def make_speeding_fine(speed_kmh: float, limit_kmh: float) -> str:
         return template.format(**data)
     except KeyError as e:
         raise ValueError(f"Error: Missing variable in template: {e}") from e
-
-# Example Usage
-make_speeding_fine(302, 110)
 
 def run():
     sim = Simulation()

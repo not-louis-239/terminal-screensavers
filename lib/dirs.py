@@ -2,25 +2,25 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
-class Dirs:
+class _Dirs:
     # Top-level, stable project directories
     if TYPE_CHECKING:
-        assets: Dirs
-        lib: Dirs
-        screensavers: Dirs
+        assets: _Dirs
+        lib: _Dirs
+        screensavers: _Dirs
 
     def __init__(self, root: Path) -> None:
         self._root = root
 
-    def __getattr__(self, name: str) -> Dirs:
+    def __getattr__(self, name: str) -> _Dirs:
         if name.startswith("_"):
             raise AttributeError(f"'{name}'")
-        return Dirs(self._root / name)
+        return _Dirs(self._root / name)
 
-    def __truediv__(self, name: str) -> Dirs:
-        return Dirs(self._root / name)
+    def __truediv__(self, name: str) -> _Dirs:
+        return _Dirs(self._root / name)
 
     def path(self) -> Path:
         return self._root
@@ -29,7 +29,7 @@ class Dirs:
     # def __fspath__(self) -> str:
     #     return str(self._root)
 
-DIRS = Dirs(ROOT_DIR)
+DIRS = _Dirs(ROOT_DIR)
 
 def _test():
     print(DIRS.path())
