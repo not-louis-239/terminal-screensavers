@@ -1,0 +1,30 @@
+    ____________________________________________________________
+   /                                                            \
+  |                          POLICE FORCE                        |
+  |                   TRAFFIC INFRINGEMENT NOTICE                |
+  |  __________________________________________________________  |
+  |                                                              |
+  |  NOTICE NO:  {random_ac_segment_0:2}-{random_ac_segment_1:3}-{random_ac_segment_2:2}             DATE:  {year:2}-{month:2}-{day:2}         |
+  |  VEHICLE:    [ CAR.PNG ]           REG:   TRM-N4L            |
+  |                                                              |
+  |  OFFENCE DETAILS:                                            |
+  |  {offence}   |
+  |                                                              |
+  |  LOCATION:   Great Eastern Highway (Outbound)                |
+  |  DETECTION:  Fixed Speed Camera (S-{camera_no:3})                      |
+  |                                                              |
+  |  ALLEGED SPEED:   [ {speed:3} KM/H ]                               |
+  |  POSTED LIMIT:    [ {limit:3} KM/H ]                               |
+  |                                                              |
+  |  MODIFIED PENALTY:    ${fine_amount:<8}                              |
+  |  DEMERIT POINTS:      {demerit_points:1}                                      |
+  |                                                              |
+  |  * RECKLESS DRIVING CHARGE PENDING *                         |
+  |  __________________________________________________________  |
+   \____________________________________________________________/
+#
+# Use {} for variable substitution
+# Use '#' for comments. Comments will be ignored by the program.
+# Do not put any newlines at the end of this file as they will be
+# treated as part of the template and counted, unless they start with '#'
+#

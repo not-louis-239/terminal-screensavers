@@ -1,3 +1,5 @@
+noise==1.2.2
+pillow==12.2.0
 pynput==1.8.1
 pyobjc-core==12.1
 pyobjc-framework-ApplicationServices==12.1
