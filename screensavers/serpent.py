@@ -88,8 +88,6 @@ class Serpent:
         self.heading %= 2 * math.pi
 
 def run():
-    # TODO: add themes which can be cycled by pressing Space
-
     themes = load_themes()
     theme_idx = 0
 

@@ -10,7 +10,7 @@ FPS = 60
 
 FALL_SPEED: float = 10  # chars/s
 
-WIND_STRENGTH: float = 0.2  # chars/s  # DEBUG: cancelling wind for now to test basic snow movement
+WIND_STRENGTH: float = 0.2  # chars/s
 WIND_CHANGE_TIME = 10
 
 SNOW_SPAWN_RATE: float = 12
