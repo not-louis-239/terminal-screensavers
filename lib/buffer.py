@@ -60,7 +60,10 @@ class Buffer:
     def resize_and_clear(self, width: int, height: int) -> None:
         self.pixels = [[self._CLEAR for _ in range(width)] for _ in range(height)]
 
-    def set_pix(self, x: int, y: int, colour: AColour, wrap: bool = False) -> None:
+    def set_pix(self, x: int, y: int, colour: Colour | AColour, wrap: bool = False) -> None:
+        if len(colour) == 3:
+            colour = (*colour, 255)
+
         w, h = self.get_size()
 
         if wrap:

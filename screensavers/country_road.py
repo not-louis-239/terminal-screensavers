@@ -21,7 +21,7 @@ FPS = 60
 SKY_COLOUR_BOTTOM = (178, 192, 255)
 SKY_COLOUR_TOP = (91, 96, 255)
 
-GROUND_COLOUR = (133, 124, 101)
+GROUND_COLOUR = (70, 45, 15)
 GROUND_HEIGHT = 12
 
 ROAD_TOP_HEIGHT = GROUND_HEIGHT - 3
@@ -77,7 +77,7 @@ class MountainRange:
         if val is not None:
             return val
 
-        noise_val = snoise2(x * self.scale, self.y * 0.5)
+        noise_val = snoise2(x * self.scale * self.parallax, self.y * 0.5)
         assert -1 <= noise_val <= 1
 
         val = noise_val * self.variance + self.y
@@ -111,9 +111,9 @@ class Simulation:
         self.car_speed = STARTING_CAR_SPEED
 
         self.mountain_ranges: list[MountainRange] = [
-            MountainRange(y=GROUND_HEIGHT + 8, colour=(122, 101, 86), variance=5, scale=0.05, parallax=1.4),
-            MountainRange(y=GROUND_HEIGHT + 15, colour=(145, 133, 125), variance=4, scale=0.05, parallax=1.8),
-            MountainRange(y=GROUND_HEIGHT + 21, colour=(191, 186, 182), variance=3, scale=0.05, parallax=2.3)
+            MountainRange(y=GROUND_HEIGHT + 8, colour=(122, 101, 86), variance=5, scale=0.03, parallax=1.4),
+            MountainRange(y=GROUND_HEIGHT + 15, colour=(145, 133, 125), variance=4, scale=0.03, parallax=1.8),
+            MountainRange(y=GROUND_HEIGHT + 21, colour=(191, 186, 182), variance=3, scale=0.03, parallax=2.3)
         ]
 
         # sort by y-coordinate in descending order so that the lowest ones are drawn last
@@ -155,13 +155,35 @@ class Simulation:
             self.buf.draw_rect(0, y, buf_width, 1, row_colour)
 
         # Draw mountains before ground so that they appear behind the ground
-        start_displacement = int(self.displacement)
-        end_displacement = start_displacement + buf_width
-
         for mountain_range in self.mountain_ranges:
             for screen_x in range(buf_width):
-                h = mountain_range.get_height_at(screen_x + self.displacement / mountain_range.parallax)
-                self.buf.draw_rect(screen_x, int(buf_height - h), 1, int(h), mountain_range.colour)
+                camera_x = self.displacement / mountain_range.parallax
+                world_x = screen_x + camera_x
+
+                h = mountain_range.get_height_at(world_x)
+                hL = mountain_range.heights.get(int(world_x - 1), h)
+                hR = mountain_range.heights.get(int(world_x + 1), h)
+
+                slope = hR - hL
+                shade = clamp(0.5 + slope * 0.1, (0, 1))
+
+                if shade > 0.5:
+                    light_strength = (shade - 0.5)
+                    base_colour = lerp_colours(mountain_range.colour, tuple(c + 10 for c in mountain_range.colour), light_strength)  # type: ignore
+                else:
+                    dark_strength = (0.5 - shade)
+                    base_colour = lerp_colours(mountain_range.colour, tuple(c - 10 for c in mountain_range.colour), dark_strength)  # type: ignore
+
+                alpha = (1 / mountain_range.parallax) ** 0.5  # **0.5 makes the transparency effect slightly less harsh
+
+                for y in range(int(buf_height - h), buf_height):
+                    dark_strength = 4 * (y - (buf_height - h))
+
+                    colour = tuple(c - int(dark_strength) for c in base_colour)
+                    assert len(colour) == 3
+                    colour = lerp_colours(SKY_COLOUR_TOP, colour, alpha)
+
+                    self.buf.set_pix(screen_x, y, colour)
 
         # Draw ground and road
         for y in range(buf_height):
