@@ -1,0 +1,50 @@
+{
+    "$schema": "./flame_materials.schema.json",
+    "materials": [
+        {
+            "name": "Wood (Carbon)",
+            "flame_colour": [255, 140, 40],
+            "description": "Standard orange-yellow from incandescent soot."
+        },
+        {
+            "name": "Lithium",
+            "flame_colour": [255, 60, 80],
+            "description": "A vibrant carmine red/pink."
+        },
+        {
+            "name": "Strontium",
+            "flame_colour": [255, 20, 20],
+            "description": "An intense, deep crimson red."
+        },
+        {
+            "name": "Boron",
+            "flame_colour": [60, 255, 120],
+            "description": "Bright, apple-green flame."
+        },
+        {
+            "name": "Copper",
+            "flame_colour": [60, 160, 255],
+            "description": "Azure blue (typically Copper(I) Chloride)."
+        },
+        {
+            "name": "Potassium",
+            "flame_colour": [180, 120, 255],
+            "description": "A pale lilac or violet hue."
+        },
+        {
+            "name": "Cesium",
+            "flame_colour": [120, 150, 255],
+            "description": "A distinct sky blue."
+        },
+        {
+            "name": "Calcium",
+            "flame_colour": [255, 100, 30],
+            "description": "Brick red to orange-red."
+        },
+        {
+            "name": "Magnesium",
+            "flame_colour": [255, 255, 220],
+            "description": "Blinding white light."
+        }
+    ]
+}
