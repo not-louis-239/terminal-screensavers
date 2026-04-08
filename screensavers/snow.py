@@ -3,7 +3,7 @@ import random
 import shutil
 
 from lib.vectors import Vector3, clamp
-from lib.utils import lerp_colours, rgb_to_str
+from lib.colours import lerp_colours, rgb_to_str
 from lib.colours import COL_RESET
 
 FPS = 60

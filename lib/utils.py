@@ -1,7 +1,5 @@
 import random
 
-from lib.custom_types import Colour
-
 def chance(p: float, /) -> bool:
     """Usage:
 
@@ -20,15 +18,3 @@ def clamp(v: float, clamp_range: tuple[float, float], /) -> float:
 
 def lerp(a: float, b: float, t: float) -> float:
     return a + (b - a) * t
-
-def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
-    return (
-        int(lerp(c1[0], c2[0], t)),
-        int(lerp(c1[1], c2[1], t)),
-        int(lerp(c1[2], c2[2], t))
-    )
-
-# TODO: Move rgb_to_string to colours module
-def rgb_to_str(colour: Colour, /, *, bg: bool = False) -> str:
-    r, g, b = colour
-    return f"\033[{48 if bg else 38};2;{r};{g};{b}m"

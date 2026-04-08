@@ -6,8 +6,7 @@ from typing import cast
 from PIL import Image
 
 from .custom_types import Colour, AColour
-from .colours import COL_RESET
-from .utils import rgb_to_str
+from .colours import COL_RESET, rgb_to_str
 
 class Buffer:
     _CLEAR: AColour = (0, 0, 0, 0)

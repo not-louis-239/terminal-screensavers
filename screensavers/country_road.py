@@ -12,9 +12,9 @@ from noise import snoise2
 
 from lib.dirs import DIRS
 from lib.custom_types import Colour
-from lib.colours import COL_RESET
+from lib.colours import COL_RESET, lerp_colours
 from lib.buffer import Buffer
-from lib.utils import lerp_colours, clamp, chance
+from lib.utils import clamp, chance
 from lib.dirs import DIRS
 from lib.kb_input_manager import KBInputManager, Keys
 

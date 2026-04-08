@@ -11,7 +11,7 @@ from pathlib import Path
 from lib.buffer import Buffer
 from lib.vectors import Vector2
 from lib.custom_types import Colour
-from lib.utils import lerp_colours
+from lib.colours import lerp_colours
 from lib.dirs import DIRS
 from lib.kb_input_manager import KBInputManager, Keys
 

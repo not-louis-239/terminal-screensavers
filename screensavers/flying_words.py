@@ -10,9 +10,9 @@ from dataclasses import dataclass
 from typing import Literal
 from pathlib import Path
 
+from lib.utils import chance
 from lib.custom_types import Colour, T
-from lib.utils import chance, rgb_to_str, lerp_colours
-from lib.colours import COL_RESET
+from lib.colours import COL_RESET, rgb_to_str, lerp_colours
 from lib.dirs import DIRS
 from lib.kb_input_manager import KBInputManager, Keys
 

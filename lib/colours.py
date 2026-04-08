@@ -1,5 +1,42 @@
+from lib.custom_types import Colour
+from lib.utils import lerp
+
 def col(code: int, bg: bool = False) -> str:
     return f"\033[{48 if bg else 38};5;{code}m"
+
+def rgb_to_str(colour: Colour, /, *, bg: bool = False) -> str:
+    r, g, b = colour
+    return f"\033[{48 if bg else 38};2;{r};{g};{b}m"
+
+def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
+    return (
+        int(lerp(c1[0], c2[0], t)),
+        int(lerp(c1[1], c2[1], t)),
+        int(lerp(c1[2], c2[2], t))
+    )
+
+def add_colours(c1: Colour, c2: Colour, /) -> Colour:
+    return (
+        int(c1[0] + c2[0]),
+        int(c1[1] + c2[1]),
+        int(c1[2] + c2[2])
+    )
+
+def subtract_colours(c1: Colour, c2: Colour, /) -> Colour:
+    return (
+        int(c1[0] - c2[0]),
+        int(c1[1] - c2[1]),
+        int(c1[2] - c2[2])
+    )
+
+def multiply_colours(c1: Colour, c2: Colour, /) -> Colour:
+    r_c1_norm, g_c1_norm, b_c1_norm = c1[0] / 255, c1[1] / 255, c1[2] / 255
+    r_c2_norm, g_c2_norm, b_c2_norm = c2[0] / 255, c2[1] / 255, c2[2] / 255
+    return (
+        int(r_c1_norm * r_c2_norm * 255),
+        int(g_c1_norm * g_c2_norm * 255),
+        int(b_c1_norm * b_c2_norm * 255)
+    )
 
 # Colourless formatting options
 FAINT = "\033[2m"
