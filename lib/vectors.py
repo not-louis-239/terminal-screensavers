@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from typing import Iterator
 from math import acos
 
 from .utils import clamp, lerp
@@ -49,6 +51,9 @@ class Vector2:
     def __copy__(self) -> Vector2:
         return type(self)(self.x, self.y)
     copy = __copy__
+
+    def __iter__(self) -> Iterator[float]:
+        return iter((self.x, self.y))
 
     # Vector-specific operations
     def length_sq(self) -> float:
@@ -148,6 +153,17 @@ class IntVector2(Vector2):
 
     def __hash__(self) -> int:
         return hash((self.x, self.y))
+
+DIRS_NEIGH4: tuple[Vector2, ...] = (
+    Vector2(-1, 0),
+    Vector2(1, 0),
+    Vector2(0, 1),
+    Vector2(0, -1)
+)
+
+DIRS_DIAG4: tuple[Vector2, ...] = tuple(Vector2(dx, dy) for dx in (-1, 1) for dy in (-1, 1))
+
+DIRS_NEIGH8: tuple[Vector2, ...] = DIRS_NEIGH4 + DIRS_DIAG4
 
 def test():
     v = Vector2(3, 4)  # 3i + 4j
