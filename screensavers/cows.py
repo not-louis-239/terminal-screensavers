@@ -161,12 +161,16 @@ class Environment:
         self.reset_cows(*size)
 
     def resize(self, new_w: int, new_h: int) -> None:
-        if (new_w, new_h) == self.get_size():
+        cur_size = self.get_size()
+        new_size = new_w, new_h
+
+        if (new_w, new_h) == cur_size:
             return
 
-        self.reset_cows(*self.get_size())
+        self.reset_tiles(*new_size)
+        self.reset_cows(*new_size)
 
-        self.buf.resize_and_clear(width=new_w, height=new_h)
+        self.buf.resize_and_clear(*new_size)
         self.update_buf()
 
     def get_size(self) -> tuple[int, int]:
@@ -183,7 +187,8 @@ class Environment:
             self.buf.set_pix(*cow_pos, colour=(255, 255, 230))
 
     def update(self) -> None:
-        env_size = self.get_size()
+        env_size = get_vis_size()
+        self.resize(*env_size)
 
         # Remove burnt cows
         self.cows = [cow for cow in self.cows if not cow.burnt()]
@@ -210,7 +215,7 @@ class Environment:
 
 def get_vis_size() -> tuple[int, int]:
     tw, th = shutil.get_terminal_size()
-    return tw, 2 * (th - 2)  # -2 because th-1 causes flicker FOR SOME REASON?!
+    return tw, 2 * (th - 1)  # -2 because th-1 causes flicker FOR SOME REASON?!
 
 def run():
     print("\033[H\033[J\033[?25l")
@@ -219,10 +224,10 @@ def run():
 
     while True:
         env.update()
-
-        print("\033[H")
+        print("\033[H", end='')
         print(env.buf.render())
         print("Press Ctrl-C to exit.", end='', flush=True)
+        time.sleep(0.005)
 
 def main():
     try:
