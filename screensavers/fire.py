@@ -46,6 +46,8 @@ class FireSim:
         self.material_idx = 0
 
     def update(self, dt_s: float, vp_w: int, vp_h: int) -> None:
+        self.kb.update()
+
         if (vp_w, vp_h) != self.buf.get_size():
             self.buf.resize_and_clear(vp_w, vp_h)
 

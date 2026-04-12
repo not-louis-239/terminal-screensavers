@@ -1,9 +1,14 @@
 import random
 
 def chance(p: float, /) -> bool:
-    """Usage:
+    """
+    Usage:
 
-    if chance(p):  # p is a float between 0 and 1"""
+    >>> if chance(0.3):
+    ...     print("30% chance")
+    >>> else:
+    ...     print("70% chance")
+    """
 
     if not 0 <= p <= 1:
         raise ValueError("chance: p must be between 0 and 1")
