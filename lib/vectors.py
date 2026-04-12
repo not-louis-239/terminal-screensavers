@@ -80,7 +80,14 @@ class Vector2:
         return self / length
 
     def angle_to(self, other: Vector2) -> float:
-        """Returns the angle to another Vector2 in radians"""
+        """
+        Returns the angle to another Vector2 in radians
+
+        Uses the dot product formula
+
+           v.u = |v||u| * cos(theta)
+        => theta = arccos(v.u / |v||u|)
+        """
 
         if self._is_zero() or other._is_zero():
             raise ValueError("angle_to is undefined for zero vectors")
@@ -90,6 +97,13 @@ class Vector2:
 
         # Using length_sq then square-rooting once is more efficient
         return acos(clamp(cos_theta, (-1, 1)))  # clamping ensures that floating-point errors don't crash the script, e.g. 1.0000000001
+
+    def wrap(self, env_w: float, env_h: float) -> Vector2:
+        """Wraps the vector within the given environment bounds"""
+        return Vector2(
+            self.x % env_w,
+            self.y % env_h
+        )
 
 class Vector3:
     def __init__(self, x: float = 0, y: float = 0, z: float = 0):

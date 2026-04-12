@@ -1,3 +1,4 @@
+import time
 import random
 from noise import snoise2 as _snoise2
 
