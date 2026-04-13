@@ -17,6 +17,21 @@ def chance(p: float, /) -> bool:
 
     return random.random() < p
 
+def collapse(n: float) -> int:
+    """
+    Stochastically round a float to the nearest integers.
+    Uses the fractional component as the probability to round up,
+    ensuring the average number over time equals the precise float value of n.
+
+    example usage:
+    >>> for _ in range(collapse(5)):
+    ...     do_something()
+    """
+    n_down = int(n)
+    if chance(n % 1):
+        return n_down + 1
+    return n_down
+
 def clamp(v: float, clamp_range: tuple[float, float], /) -> float:
     lower, upper = clamp_range
     if lower > upper:

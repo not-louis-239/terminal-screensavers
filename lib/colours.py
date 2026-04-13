@@ -1,5 +1,5 @@
 from lib.custom_types import Colour
-from lib.utils import lerp
+from lib.utils import lerp, clamp
 
 def col(code: int, bg: bool = False) -> str:
     return f"\033[{48 if bg else 38};5;{code}m"
@@ -16,11 +16,16 @@ def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
     )
 
 def add_colours(c1: Colour, c2: Colour, /) -> Colour:
-    return (
-        int(c1[0] + c2[0]),
-        int(c1[1] + c2[1]),
-        int(c1[2] + c2[2])
+    r1, g1, b1 = c1
+    r2, g2, b2 = c2
+
+    rf, gf, bf = (
+        clamp(int(r1 + r2), (0, 255)),
+        clamp(int(g1 + g2), (0, 255)),
+        clamp(int(b1 + b2), (0, 255))
     )
+
+    return (rf, gf, bf)  # type: ignore
 
 def subtract_colours(c1: Colour, c2: Colour, /) -> Colour:
     return (
@@ -37,6 +42,10 @@ def multiply_colours(c1: Colour, c2: Colour, /) -> Colour:
         int(g_c1_norm * g_c2_norm * 255),
         int(b_c1_norm * b_c2_norm * 255)
     )
+
+def scale_brightness(colour: Colour, scalar: float) -> Colour:
+    r, g, b = colour[0], colour[1], colour[2]
+    return (int(r * scalar), int(g * scalar), int(b * scalar))
 
 # Colourless formatting options
 FAINT = "\033[2m"
