@@ -8,12 +8,12 @@ from math import sin, cos
 from dataclasses import dataclass
 from pathlib import Path
 
-from lib.buffer import Buffer
-from lib.vectors import Vector2
-from lib.custom_types import Colour
-from lib.colours import lerp_colours
-from lib.dirs import DIRS
-from lib.kb_input_manager import KBInputManager, Keys
+from src.screensavers.utils.buffer import Buffer
+from src.screensavers.utils.vectors import Vector2
+from src.screensavers.utils.custom_types import Colour
+from src.screensavers.utils.colours import lerp_colours
+from src.screensavers.utils.dirs import DIRS
+from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
 
 MOVEMENT_SPEED = 80  # units per second
 TURN_SPEED = 1.8  # radians/s max

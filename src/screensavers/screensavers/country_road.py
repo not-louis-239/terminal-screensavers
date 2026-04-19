@@ -10,13 +10,13 @@ import random
 
 from noise import snoise2
 
-from lib.dirs import DIRS
-from lib.custom_types import Colour
-from lib.colours import COL_RESET, lerp_colours
-from lib.buffer import Buffer
-from lib.utils import clamp, chance
-from lib.dirs import DIRS
-from lib.kb_input_manager import KBInputManager, Keys
+from src.screensavers.utils.dirs import DIRS
+from src.screensavers.utils.custom_types import Colour
+from src.screensavers.utils.colours import COL_RESET, lerp_colours
+from src.screensavers.utils.buffer import Buffer
+from src.screensavers.utils.utils import clamp, chance
+from src.screensavers.utils.dirs import DIRS
+from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
 SKY_COLOUR_BOTTOM = (178, 192, 255)

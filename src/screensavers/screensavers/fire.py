@@ -4,14 +4,14 @@ import shutil
 import random
 from dataclasses import dataclass
 
-from lib.utils import collapse
-from lib.colours import add_colours, scale_brightness
-from lib.vectors import Vector2
-from lib.clock import Clock
-from lib.buffer import Buffer
-from lib.custom_types import Colour
-from lib.dirs import DIRS
-from lib.kb_input_manager import KBInputManager, Keys
+from src.screensavers.utils.utils import collapse
+from src.screensavers.utils.colours import add_colours, scale_brightness
+from src.screensavers.utils.vectors import Vector2
+from src.screensavers.utils.clock import Clock
+from src.screensavers.utils.buffer import Buffer
+from src.screensavers.utils.custom_types import Colour
+from src.screensavers.utils.dirs import DIRS
+from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
 

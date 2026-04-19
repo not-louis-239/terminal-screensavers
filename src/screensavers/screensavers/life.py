@@ -5,9 +5,9 @@ import time
 import sys
 import shutil
 
-from lib.utils import chance
-from lib.buffer import Buffer
-from lib.custom_types import Colour
+from src.screensavers.utils.utils import chance
+from src.screensavers.utils.buffer import Buffer
+from src.screensavers.utils.custom_types import Colour
 
 STARTING_ALIVE_CHANCE = 0.35
 SPONTANEOUS_BIRTH_CHANCE = 0.0005  # per cell, per frame

@@ -10,11 +10,11 @@ from dataclasses import dataclass
 from typing import Literal
 from pathlib import Path
 
-from lib.utils import chance
-from lib.custom_types import Colour, T
-from lib.colours import COL_RESET, rgb_to_str, lerp_colours
-from lib.dirs import DIRS
-from lib.kb_input_manager import KBInputManager, Keys
+from src.screensavers.utils.utils import chance
+from src.screensavers.utils.custom_types import Colour, T
+from src.screensavers.utils.colours import COL_RESET, rgb_to_str, lerp_colours
+from src.screensavers.utils.dirs import DIRS
+from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
 SPAWN_CHANCE = 0.5

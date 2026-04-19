@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from typing import Callable
 from functools import lru_cache
 
-from lib.kb_input_manager import KBInputManager, Keys
-from lib.clock import Clock
-from lib.colours import col, lerp_colours
-from lib.vectors import Vector2
+from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
+from src.screensavers.utils.clock import Clock
+from src.screensavers.utils.colours import col, lerp_colours
+from src.screensavers.utils.vectors import Vector2
 
 FPS = 60
 CELL_SIZE = 10

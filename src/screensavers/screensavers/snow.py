@@ -2,9 +2,9 @@ import time
 import random
 import shutil
 
-from lib.vectors import Vector3, clamp
-from lib.colours import lerp_colours, rgb_to_str
-from lib.colours import COL_RESET
+from src.screensavers.utils.vectors import Vector3, clamp
+from src.screensavers.utils.colours import lerp_colours, rgb_to_str
+from src.screensavers.utils.colours import COL_RESET
 
 FPS = 60
 

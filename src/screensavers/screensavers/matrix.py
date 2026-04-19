@@ -3,7 +3,7 @@ import random
 import time
 import sys
 
-from lib.colours import col
+from src.screensavers.utils.colours import col
 
 CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-=_+[]{}|:;'<>?,./"
 BRIGHTNESS_COLOUR_MAP: dict[float, int] = {

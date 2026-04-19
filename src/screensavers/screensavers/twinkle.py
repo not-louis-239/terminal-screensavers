@@ -1,11 +1,11 @@
 import sys
 import random
 
-from lib.clock import Clock
-from lib.kb_input_manager import KBInputManager, Keys
-from lib.vectors import Vector2
-from lib.custom_types import Colour
-from lib.colours import lerp_colours
+from src.screensavers.utils.clock import Clock
+from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
+from src.screensavers.utils.vectors import Vector2
+from src.screensavers.utils.custom_types import Colour
+from src.screensavers.utils.colours import lerp_colours
 
 FPS = 60
 STAR_SPAWN_CHANCE = 0.025  # stars per cell

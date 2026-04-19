@@ -1,5 +1,5 @@
-from lib.custom_types import Colour
-from lib.utils import lerp, clamp
+from src.screensavers.utils.custom_types import Colour
+from src.screensavers.utils.utils import lerp, clamp
 
 def col(code: int, bg: bool = False) -> str:
     return f"\033[{48 if bg else 38};5;{code}m"
