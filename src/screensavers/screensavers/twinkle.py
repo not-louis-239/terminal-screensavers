@@ -1,11 +1,12 @@
 import sys
+import shutil
 import random
 
 from screensavers.utils.clock import Clock
 from screensavers.utils.kb_input_manager import KBInputManager, Keys
 from screensavers.utils.vectors import Vector2
 from screensavers.utils.custom_types import Colour
-from screensavers.utils.colours import lerp_colours
+from screensavers.utils.colours import lerp_colours, rgb_to_str, COL_RESET
 
 FPS = 60
 STAR_SPAWN_CHANCE = 0.025  # stars per cell
@@ -35,6 +36,10 @@ def make_star_colours() -> list[Colour]:
 
     return colours
 
+def get_visible_area() -> tuple[int, int]:
+    term_w, term_h = shutil.get_terminal_size()
+    return term_w, term_h - 1
+
 class Star:
     def __init__(
             self,
@@ -48,6 +53,17 @@ class Star:
         self.colour = colour
         self.char = char
         self.twinkle_freq = twinkle_freq
+        self._cached_colour_str = rgb_to_str(colour)
+
+    def is_visible(self, env_x: float, env_y: float, env_w: float, env_h: float) -> bool:
+        x, y = self.pos
+        return (
+            env_x < x < env_x + env_w
+            and env_y < y < env_y + env_h
+        )
+
+    def render(self) -> str:
+        return f"{self._cached_colour_str}{self.char}"
 
     def update(self, dt_s: float) -> None:
         self.phase += dt_s * self.twinkle_freq
@@ -84,15 +100,36 @@ class Starfield:
             star.update(dt_s=dt_s)
 
     def take_input(self, dt_s) -> None:
+        # 2x multiplier on horizontal speed makes up for the fact that
+        # terminal characters are taller than they are wide.
+
         if self.kb.is_down(Keys.W):
             self.viewport_pos.y -= VIEWPORT_SCROLL_SPEED * dt_s
         if self.kb.is_down(Keys.S):
             self.viewport_pos.y += VIEWPORT_SCROLL_SPEED * dt_s
         if self.kb.is_down(Keys.A):
-            self.viewport_pos.x -= VIEWPORT_SCROLL_SPEED * dt_s
+            self.viewport_pos.x -= VIEWPORT_SCROLL_SPEED * dt_s * 2
         if self.kb.is_down(Keys.D):
-            self.viewport_pos.x += VIEWPORT_SCROLL_SPEED * dt_s
+            self.viewport_pos.x += VIEWPORT_SCROLL_SPEED * dt_s * 2
         self.viewport_pos = self.viewport_pos.wrap(env_w=WRAP_SIZE[0], env_h=WRAP_SIZE[1])
+
+    def render(self) -> str:
+        vis_w, vis_h = get_visible_area()
+
+        buf = [[" "] * vis_w for _ in range(vis_h)]
+
+        for star in self.stars:
+            # If the star is not within the visible area, skip it
+            if not star.is_visible(env_x=self.viewport_pos.x, env_y=self.viewport_pos.y, env_w=vis_w, env_h=vis_h):
+                continue
+
+            # Calculate the position of the star in relation to the viewport
+            view_x, view_y = int(star.pos.x - self.viewport_pos.x), int(star.pos.y - self.viewport_pos.y)
+
+            # Draw it to the buffer
+            buf[view_y][view_x] = star.render()
+
+        return "\n".join("".join(row) for row in buf) + COL_RESET
 
 def run():
     starfield = Starfield()
@@ -101,6 +138,9 @@ def run():
         dt_s = starfield.clock.tick(FPS)
         starfield.update(dt_s)
         starfield.take_input(dt_s)
+
+        print(starfield.render())
+        print(f"Position: ({starfield.viewport_pos.x:,.2f}, {starfield.viewport_pos.y:,.2f}) | Press Ctrl-C to exit.", end='', flush=True)
 
 def main():
     try:
@@ -111,3 +151,6 @@ def main():
 
     print("\033[H\033[J\033[?25h", end='')
     sys.exit(0)
+
+if __name__ == "__main__":
+    main()
