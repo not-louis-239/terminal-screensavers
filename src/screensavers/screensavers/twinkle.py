@@ -55,11 +55,18 @@ class Star:
         self.twinkle_freq = twinkle_freq
         self._cached_colour_str = rgb_to_str(colour)
 
-    def is_visible(self, env_x: float, env_y: float, env_w: float, env_h: float) -> bool:
-        x, y = self.pos
+    def get_wrapped_view_pos(self, viewport_pos: Vector2, env_w: float, env_h: float) -> Vector2:
+        """Return the star position relative to the viewport in a wrapped environment."""
+        return Vector2(
+            (self.pos.x - viewport_pos.x) % env_w,
+            (self.pos.y - viewport_pos.y) % env_h
+        )
+
+    def is_visible(self, viewport_pos: Vector2, env_w: float, env_h: float, vis_w: float, vis_h: float) -> bool:
+        view_pos = self.get_wrapped_view_pos(viewport_pos=viewport_pos, env_w=env_w, env_h=env_h)
         return (
-            env_x < x < env_x + env_w
-            and env_y < y < env_y + env_h
+            0 <= view_pos.x < vis_w
+            and 0 <= view_pos.y < vis_h
         )
 
     def render(self) -> str:
@@ -119,14 +126,23 @@ class Starfield:
         buf = [[" "] * vis_w for _ in range(vis_h)]
 
         for star in self.stars:
-            # If the star is not within the visible area, skip it
-            if not star.is_visible(env_x=self.viewport_pos.x, env_y=self.viewport_pos.y, env_w=vis_w, env_h=vis_h):
+            # Skip stars not visible
+            if not star.is_visible(
+                viewport_pos=self.viewport_pos,
+                env_w=WRAP_SIZE[0],
+                env_h=WRAP_SIZE[1],
+                vis_w=vis_w,
+                vis_h=vis_h
+            ):
                 continue
 
-            # Calculate the position of the star in relation to the viewport
-            view_x, view_y = int(star.pos.x - self.viewport_pos.x), int(star.pos.y - self.viewport_pos.y)
-
-            # Draw it to the buffer
+            # Draw visible stars to the buffer
+            view_pos = star.get_wrapped_view_pos(
+                viewport_pos=self.viewport_pos,
+                env_w=WRAP_SIZE[0],
+                env_h=WRAP_SIZE[1]
+            )
+            view_x, view_y = int(view_pos.x), int(view_pos.y)
             buf[view_y][view_x] = star.render()
 
         return "\n".join("".join(row) for row in buf) + COL_RESET
