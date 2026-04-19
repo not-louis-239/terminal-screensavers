@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from typing import Callable
 from functools import lru_cache
 
-from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
-from src.screensavers.utils.clock import Clock
-from src.screensavers.utils.colours import col, lerp_colours
-from src.screensavers.utils.vectors import Vector2
+from screensavers.utils.kb_input_manager import KBInputManager, Keys
+from screensavers.utils.clock import Clock
+from screensavers.utils.colours import col, lerp_colours
+from screensavers.utils.vectors import Vector2
 
 FPS = 60
 CELL_SIZE = 10
@@ -223,7 +223,7 @@ class ViewWindow:
         print("\n".join(''.join(row) for row in buf))
 
         hud_str = f"\033[0mHighlight: {self.colour_modes[self.colour_mode_idx].name} | Scroll Speed: {self.scroll_speed:.2f} pix/s"
-        print(f"{hud_str} | Press Ctrl-C to exit.", flush=True)
+        print(f"{' ' * vis_w}\r{hud_str} | Press Ctrl-C to exit.", flush=True, end='')
 
 def run():
     wn = ViewWindow()

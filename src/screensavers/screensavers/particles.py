@@ -7,10 +7,10 @@ import random
 from math import sin, cos
 from typing import Literal
 
-from src.screensavers.utils.clock import Clock
-from src.screensavers.utils.buffer import Buffer
-from src.screensavers.utils.utils import chance
-from src.screensavers.utils.vectors import Vector2
+from screensavers.utils.clock import Clock
+from screensavers.utils.buffer import Buffer
+from screensavers.utils.utils import chance
+from screensavers.utils.vectors import Vector2
 
 FPS = 60
 PARTICLE_SPAWN_RATE = 5  # rate per second

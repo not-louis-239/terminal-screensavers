@@ -18,9 +18,12 @@ import runpy
 import sys
 from pathlib import Path
 
-SCREENSAVERS_DIR = Path(__file__).parent / "screensavers"
+sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
+
+from screensavers.utils.dirs import DIRS
+
 screensaver_files: dict[str, Path] = {}
-for fp in SCREENSAVERS_DIR.rglob("*.py"):
+for fp in (DIRS.src.screensavers.path()).rglob("*.py"):
     screensaver_files[fp.stem] = fp
 
 def main():

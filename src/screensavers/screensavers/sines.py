@@ -1,12 +1,12 @@
 import sys
 import shutil
 
-from src.screensavers.utils.custom_types import Colour
-from src.screensavers.utils.kb_input_manager import KBInputManager
-from src.screensavers.utils.colours import lerp_colours, rgb_to_str
-from src.screensavers.utils.utils import clamp
-from src.screensavers.utils.buffer import Buffer
-from src.screensavers.utils.clock import Clock
+from screensavers.utils.custom_types import Colour
+from screensavers.utils.kb_input_manager import KBInputManager
+from screensavers.utils.colours import lerp_colours, rgb_to_str
+from screensavers.utils.utils import clamp
+from screensavers.utils.buffer import Buffer
+from screensavers.utils.clock import Clock
 
 FPS = 60
 SPAWN_RATE = 0.6  # chance to spawn a wave per second

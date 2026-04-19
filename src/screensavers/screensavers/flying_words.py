@@ -10,11 +10,11 @@ from dataclasses import dataclass
 from typing import Literal
 from pathlib import Path
 
-from src.screensavers.utils.utils import chance
-from src.screensavers.utils.custom_types import Colour, T
-from src.screensavers.utils.colours import COL_RESET, rgb_to_str, lerp_colours
-from src.screensavers.utils.dirs import DIRS
-from src.screensavers.utils.kb_input_manager import KBInputManager, Keys
+from screensavers.utils.utils import chance
+from screensavers.utils.custom_types import Colour, T
+from screensavers.utils.colours import COL_RESET, rgb_to_str, lerp_colours
+from screensavers.utils.dirs import DIRS
+from screensavers.utils.kb_input_manager import KBInputManager, Keys
 
 FPS = 60
 SPAWN_CHANCE = 0.5

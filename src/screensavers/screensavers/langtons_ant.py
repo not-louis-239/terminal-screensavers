@@ -1,5 +1,5 @@
-from src.screensavers.utils.vectors import IntVector2
-from src.screensavers.utils.colours import col, COL_RESET
+from screensavers.utils.vectors import IntVector2
+from screensavers.utils.colours import col, COL_RESET
 import shutil
 import time
 

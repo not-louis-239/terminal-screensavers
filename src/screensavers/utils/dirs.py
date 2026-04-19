@@ -2,14 +2,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parents[3]
 
 class _Dirs:
     # Top-level, stable project directories
     if TYPE_CHECKING:
         assets: _Dirs
-        lib: _Dirs
-        screensavers: _Dirs
+        bin: _Dirs
+        src: _Dirs
 
     def __init__(self, root: Path) -> None:
         self._root = root
@@ -38,9 +38,9 @@ def _test():
     print((DIRS.assets.images / "sprite.png").path())
 
     try:
-        DIRS.assets._images
+        print(DIRS.assets._images)
     except AttributeError as e:
-        print(f"{type(e).__name__}: {e}")
+        print(f"AttributeError on attempting to access private attribute: {e}")
 
 if __name__ == "__main__":
     _test()

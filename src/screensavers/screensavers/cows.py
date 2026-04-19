@@ -15,11 +15,11 @@ import time
 
 
 
-from src.screensavers.utils.vectors import Vector2, DIRS_NEIGH8
-from src.screensavers.utils.buffer import Buffer
-from src.screensavers.utils.utils import snoise2
-from src.screensavers.utils.colours import lerp_colours
-from src.screensavers.utils.custom_types import Colour
+from screensavers.utils.vectors import Vector2, DIRS_NEIGH8
+from screensavers.utils.buffer import Buffer
+from screensavers.utils.utils import snoise2
+from screensavers.utils.colours import lerp_colours
+from screensavers.utils.custom_types import Colour
 
 STARTING_DENSITY = 80
 NUM_COWS = 100
