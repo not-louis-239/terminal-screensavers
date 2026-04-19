@@ -1,6 +1,7 @@
 import sys
 import shutil
 import random
+import math
 
 from screensavers.utils.clock import Clock
 from screensavers.utils.kb_input_manager import KBInputManager, Keys
@@ -14,7 +15,7 @@ VIEWPORT_SCROLL_SPEED = 60  # pix/s
 WRAP_SIZE = (2_000, 1_500)
 
 MIN_TWINKLE_FREQ = 0.1
-MAX_TWINKLE_FREQ = 3
+MAX_TWINKLE_FREQ = 0.4
 
 STAR_CHARS = "+*·•✦"
 
@@ -48,12 +49,11 @@ class Star:
             char: str,
             twinkle_freq: float  # cycles/s
         ) -> None:
-        self.phase = 0
+        self.phase = random.uniform(0, 1)
         self.pos = pos
         self.colour = colour
         self.char = char
         self.twinkle_freq = twinkle_freq
-        self._cached_colour_str = rgb_to_str(colour)
 
     def get_wrapped_view_pos(self, viewport_pos: Vector2, env_w: float, env_h: float) -> Vector2:
         """Return the star position relative to the viewport in a wrapped environment."""
@@ -70,11 +70,15 @@ class Star:
         )
 
     def render(self) -> str:
-        return f"{self._cached_colour_str}{self.char}"
+        sin = math.sin(self.phase * math.pi) ** 2
+        rel_brightness = 0.3 + 0.7 * sin
+
+        colour = lerp_colours((0, 0, 0), self.colour, rel_brightness)
+        return f"{rgb_to_str(colour)}{self.char}"
 
     def update(self, dt_s: float) -> None:
         self.phase += dt_s * self.twinkle_freq
-        self.phase = self.phase % 1
+        self.phase %= 1
 
 class Starfield:
     def __init__(self) -> None:
@@ -156,7 +160,7 @@ def run():
         starfield.take_input(dt_s)
 
         print(starfield.render())
-        print(f"Position: ({starfield.viewport_pos.x:,.2f}, {starfield.viewport_pos.y:,.2f}) | Press Ctrl-C to exit.", end='', flush=True)
+        print(f"WASD - Move | Press Ctrl-C to exit.", end='', flush=True)
 
 def main():
     try:

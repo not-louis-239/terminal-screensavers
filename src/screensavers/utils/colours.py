@@ -9,6 +9,9 @@ def rgb_to_str(colour: Colour, /, *, bg: bool = False) -> str:
     return f"\033[{48 if bg else 38};2;{r};{g};{b}m"
 
 def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
+    if not 0 <= t <= 1:
+        raise ValueError("t must be between 0 and 1")
+
     return (
         int(lerp(c1[0], c2[0], t)),
         int(lerp(c1[1], c2[1], t)),
