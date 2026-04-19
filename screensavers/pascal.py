@@ -3,6 +3,7 @@ import sys
 import shutil
 from dataclasses import dataclass
 from typing import Callable
+from functools import lru_cache
 
 from lib.kb_input_manager import KBInputManager, Keys
 from lib.clock import Clock
@@ -10,14 +11,14 @@ from lib.colours import col, lerp_colours
 from lib.vectors import Vector2
 
 FPS = 60
-SCROLL_SPEED_VERT = 40  # pixels/s
-SCROLL_SPEED_HORIZ = 60  # pixels/s
 CELL_SIZE = 10
 
-# TODO: optimise this so a freaking terminal screensaver doesn't heat up my computer
-
-def nCr(n: int, r: int) -> int:
-    return math.comb(n, r)
+@lru_cache(maxsize=4096)
+def pascal_row(n: int) -> tuple[int, ...]:
+    row = (1,)
+    for k in range(1, n + 1):
+        row = row + (row[-1] * (n - k + 1) // k,)
+    return row
 
 def get_visible_area() -> tuple[int, int]:
     term_w, term_h = shutil.get_terminal_size()
@@ -42,8 +43,12 @@ def format_number(n: int) -> str:
             break
     else:
         exp = math.floor(math.log10(n))
-        mantissa = n / (10**exp)
-        string = f"{mantissa:.2f}e{exp}"
+
+        if exp > 10_000:
+            string = "????"
+        else:
+            mantissa = n / (10**exp)
+            string = f"{mantissa:.2f}e{exp}"
 
     return string[:CELL_SIZE - 1].center(CELL_SIZE - 1) + " "
 
@@ -143,6 +148,7 @@ class ViewWindow:
         self.clock = Clock()
         self.kb = KBInputManager()
         self.pos = Vector2(0, 0)
+        self.scroll_speed = 40
         self.colour_mode_idx: int = 0
         self.colour_modes: list[ColourMode] = get_colour_modes()
 
@@ -151,13 +157,17 @@ class ViewWindow:
 
     def take_input(self, dt_s: float) -> None:
         if self.kb.is_down(Keys.W):
-            self.pos.y -= SCROLL_SPEED_VERT * dt_s
+            self.pos.y -= self.scroll_speed * dt_s
         if self.kb.is_down(Keys.S):
-            self.pos.y += SCROLL_SPEED_VERT * dt_s
+            self.pos.y += self.scroll_speed * dt_s
         if self.kb.is_down(Keys.A):
-            self.pos.x -= SCROLL_SPEED_HORIZ * dt_s
+            self.pos.x -= self.scroll_speed * dt_s
         if self.kb.is_down(Keys.D):
-            self.pos.x += SCROLL_SPEED_HORIZ * dt_s
+            self.pos.x += self.scroll_speed * dt_s
+        if self.kb.is_down(Keys.R):
+            self.scroll_speed *= 2 ** dt_s
+        if self.kb.is_down(Keys.F):
+            self.scroll_speed /= 2 ** dt_s
         if self.kb.went_down(Keys.SPACE):
             self.colour_mode_idx = (self.colour_mode_idx + 1) % len(self.colour_modes)
 
@@ -193,7 +203,7 @@ class ViewWindow:
             # Iterate through the calculated r-range
             for r in range(start_r, end_r):
                 if 0 <= r <= y:
-                    num = nCr(y, r)
+                    num = pascal_row(y)[r]
                     string = format_number(num)
                     colour = self.colour_modes[self.colour_mode_idx].func(num)
 
@@ -212,8 +222,8 @@ class ViewWindow:
         print("\033[H", end='')
         print("\n".join(''.join(row) for row in buf))
 
-        hud_str = f"\033[0mHighlight: {self.colour_modes[self.colour_mode_idx].name}"
-        print(f"{hud_str:<24} | Press Ctrl-C to exit.", flush=True)
+        hud_str = f"\033[0mHighlight: {self.colour_modes[self.colour_mode_idx].name} | Scroll Speed: {self.scroll_speed:.2f} pix/s"
+        print(f"{hud_str} | Press Ctrl-C to exit.", flush=True)
 
 def run():
     wn = ViewWindow()
