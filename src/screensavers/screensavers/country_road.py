@@ -307,7 +307,7 @@ def run():
         print("\033[H", end='')
         print(buf_str)
         hud_str = f"Distance: {f"{sim.displacement / 1000:.2f}":>7} km | Speed: {speed_colour}{f"{sim.car_speed * 3.6:.0f}":>4}{COL_RESET} km/h"
-        print(f"{hud_str} | Press Ctrl-C to conclude your journey.", flush=True)
+        print(f"{hud_str} | Press Ctrl-C to conclude your journey.", flush=True, end='')
 
         time.sleep(dt_s)
 

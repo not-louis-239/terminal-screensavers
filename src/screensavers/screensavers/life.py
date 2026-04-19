@@ -145,7 +145,7 @@ def run() -> None:
         sim.resize(*calc_visible_area())
         sim.update()
         print(sim.render())
-        print("Press Ctrl-C to exit.", flush=True)
+        print("Press Ctrl-C to exit.", flush=True, end='')
         time.sleep(0.05)
 
 def main() -> None:

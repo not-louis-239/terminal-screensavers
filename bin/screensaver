@@ -16,31 +16,64 @@
 
 import runpy
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from screensavers.utils.dirs import DIRS
 
-screensaver_files: dict[str, Path] = {}
-for fp in (DIRS.src.screensavers.path()).rglob("*.py"):
-    screensaver_files[fp.stem] = fp
+__version__ = "1.0.0"
+
+def fatal_err(msg: str):
+    print(f"{sys.argv[0]}: fatal: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+def get_available_screensavers() -> dict[str, Path]:
+    screensaver_files: dict[str, Path] = {}
+    for fp in (DIRS.src.screensavers.screensavers.path()).rglob("*.py"):
+        screensaver_files[fp.stem] = fp
+    return screensaver_files
+
+SCREENSAVERS = get_available_screensavers()
+
+@dataclass
+class Args:
+    screensaver_name: str
+
+def parse_args() -> Args:
+    args_raw = sys.argv[1:]
+
+    if not args_raw:
+        fatal_err("missing args. run with -h or --help for usage information.")
+
+    if "-h" in args_raw or "--help" in args_raw:
+        print(f"Usage: {sys.argv[0]} <screensaver_name>")
+        print(f"Available screensavers:\n{'\033[2m,\033[0m '.join(sorted(SCREENSAVERS.keys()))}")
+        sys.exit(0)
+
+    if "--version" in args_raw:
+        print(f"screensaver-cli v{__version__}")
+        sys.exit(0)
+
+    if len(args_raw) > 1:
+        fatal_err("invalid number of args. run with -h or --help for usage information.")
+
+    return Args(screensaver_name=args_raw[0])
 
 def main():
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <screensaver_name>")
-        print("\nAvailable screensavers: ")
-        for name in screensaver_files.keys():
-            print(name)
-        sys.exit(1)
-    else:
-        screensaver_name = sys.argv[1]
-        if screensaver_name not in screensaver_files:
-            print(f"No screensaver named '{screensaver_name}'.")
-            sys.exit(1)
-        else:
-            fp = screensaver_files[screensaver_name]
-            runpy.run_path(str(fp), run_name="__main__")
+    args = parse_args()
+    screensaver_name = args.screensaver_name
+
+    if screensaver_name not in SCREENSAVERS:
+        fatal_err(f"No screensaver named '{screensaver_name}'.")
+
+    fp = SCREENSAVERS[screensaver_name]
+
+    try:
+        runpy.run_path(str(fp), run_name="__main__")
+    except ModuleNotFoundError:
+        fatal_err("Screensaver failed to load. Please install required dependencies. (See README.md for details)")
 
 if __name__ == "__main__":
     main()

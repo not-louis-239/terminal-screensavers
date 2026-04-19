@@ -119,7 +119,7 @@ def run():
         sim.update(1 / FPS, term_w, term_h)
         sim.draw(term_w, term_h)
 
-        print("Press Ctrl-C to exit.", flush=True)
+        print("Press Ctrl-C to exit.", flush=True, end='')
 
         time.sleep(1 / FPS)
 

@@ -109,7 +109,7 @@ def run():
 
         print("\033[H\033[J", end='')
         screen.draw(vp_w, vp_h)
-        print("Press Ctrl-C to exit.")
+        print("Press Ctrl-C to exit.", end='', flush=True)
 
         time.sleep(0.03)
 

@@ -230,7 +230,10 @@ class FlyingWordsSim:
 
                 self.buffer[y][x] = f"{colour_str}{char}{COL_RESET}"
 
-        print("\n".join(["".join(row) for row in self.buffer]), flush=True)
+        # The HUD is printed after the viewport, so each frame needs to move the
+        # cursor back to the top-left before redrawing the buffer.
+        frame = "\n".join("".join(row) for row in self.buffer)
+        print(f"\033[H{frame}", flush=True)
 
 def run():
     sim = FlyingWordsSim()
@@ -279,7 +282,7 @@ def run():
         sim.draw(viewport_w=tw, viewport_h=visible_h)
 
         hud_text = f"{f"Temp: {sim.temperature:.1f}°C":<15} | {f"Theme: {sim.kw_packs[sim.current_kw_pack_idx].name.title()}":<15}"
-        print(f"{hud_text:<32} | Press Ctrl-C to exit.", flush=True)
+        print(f"{' ' * tw}\r{hud_text:<32} | Press Ctrl-C to exit.", flush=True, end='')
 
         time.sleep(1 / FPS)
         termios.tcflush(sys.stdin, termios.TCIFLUSH)
