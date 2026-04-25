@@ -116,8 +116,8 @@ def run():
 
         term_w, term_h = shutil.get_terminal_size()
 
-        sim.update(1 / FPS, term_w, term_h)
-        sim.draw(term_w, term_h)
+        sim.update(1 / FPS, term_w, term_h - 1)
+        sim.draw(term_w, term_h - 1)
 
         print("Press Ctrl-C to exit.", flush=True, end='')
 
