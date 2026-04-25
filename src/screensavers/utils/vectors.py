@@ -74,6 +74,7 @@ class Vector2:
         return self.x * other.x + self.y * other.y
 
     def normalise(self) -> Vector2:
+        """Returns the unit vector of self."""
         length = self.length()
         if length == 0:
             raise ValueError("cannot normalise a zero vector")
@@ -148,7 +149,10 @@ class Vector3:
         return self.length_sq() ** 0.5
 
     def normalise(self) -> Vector3:
-        return self / self.length()
+        length = self.length()
+        if length == 0:
+            raise ValueError("Cannot normalise a zero vector.")
+        return self / length
 
     def lerp(self, other: Vector3, t: float) -> Vector3:
         return Vector3(
