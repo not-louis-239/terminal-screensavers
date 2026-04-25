@@ -25,54 +25,79 @@ from screensavers.utils.dirs import DIRS
 
 __version__ = "1.0.0"
 
-def fatal_err(msg: str):
+SCREENSAVERS_DIR = DIRS.src.screensavers.screensavers.path()
+GAMES_DIR = DIRS.src.screensavers.games.path()
+
+def fatal_err(msg: str, exitcode: int = 1):
     print(f"{sys.argv[0]}: fatal: {msg}", file=sys.stderr)
-    sys.exit(1)
+    sys.exit(exitcode)
 
-def get_available_screensavers() -> dict[str, Path]:
-    screensaver_files: dict[str, Path] = {}
-    for fp in (DIRS.src.screensavers.screensavers.path()).rglob("*.py"):
-        screensaver_files[fp.stem] = fp
-    return screensaver_files
+def get_available_scripts(path: Path) -> dict[str, Path]:
+    filepaths: dict[str, Path] = {}
+    for fp in path.rglob("*.py"):
+        filepaths[fp.stem] = fp
+    return filepaths
 
-SCREENSAVERS = get_available_screensavers()
+progs: dict[Path, dict[str, Path]] = {
+    SCREENSAVERS_DIR: get_available_scripts(SCREENSAVERS_DIR),
+    GAMES_DIR: get_available_scripts(GAMES_DIR)
+}
+
+def show_help() -> None:
+    print(f"Usage: {sys.argv[0]} [-g] <screensaver_name>")
+    print(f"    screensaver_name      the name of the program to run")
+    print(f"    -g                    search for games instead of screensavers")
+    print(f"\nAvailable screensavers:\n    {', '.join(progs[SCREENSAVERS_DIR].keys())}")
+    print(f"\nAvailable games:\n    {', '.join(progs[GAMES_DIR].keys())}")
 
 @dataclass
 class Args:
-    screensaver_name: str
+    prog_name: str
+    search_games: bool = False
 
 def parse_args() -> Args:
     args_raw = sys.argv[1:]
 
+    search_games = False
+
     if not args_raw:
-        fatal_err("missing args. run with -h or --help for usage information.")
+        show_help()
+        sys.exit(1)
 
     if "-h" in args_raw or "--help" in args_raw:
-        print(f"Usage: {sys.argv[0]} <screensaver_name>")
-        print(f"Available screensavers:\n{'\033[2m,\033[0m '.join(sorted(SCREENSAVERS.keys()))}")
+        show_help()
         sys.exit(0)
 
     if "--version" in args_raw:
         print(f"screensaver-cli v{__version__}")
         sys.exit(0)
 
-    if len(args_raw) > 1:
-        fatal_err("invalid number of args. run with -h or --help for usage information.")
+    if "-g" in args_raw:
+        search_games = True
+        args_raw = [a for a in args_raw if a != "-g"]
 
-    return Args(screensaver_name=args_raw[0])
+    if len(args_raw) != 1:
+        fatal_err("invalid args. run with '-h' or '--help' for usage info.", exitcode=2)
+
+    prog_name = args_raw[0]
+
+    return Args(prog_name=prog_name, search_games=search_games)
 
 def main():
     args = parse_args()
-    screensaver_name = args.screensaver_name
 
-    if screensaver_name not in SCREENSAVERS:
-        fatal_err(f"No screensaver named '{screensaver_name}'.")
+    if args.search_games:
+        search_dict = progs[GAMES_DIR]
+    else:
+        search_dict = progs[SCREENSAVERS_DIR]
 
-    fp = SCREENSAVERS[screensaver_name]
+    fp = search_dict.get(args.prog_name)
+    if not fp:
+        fatal_err(f"No such {"game" if args.search_games else "screensaver"}: {args.prog_name}")
 
     try:
         runpy.run_path(str(fp), run_name="__main__")
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # missing dependencies
         fatal_err("Screensaver failed to load. Please install required dependencies. (See README.md for details)")
 
 if __name__ == "__main__":
