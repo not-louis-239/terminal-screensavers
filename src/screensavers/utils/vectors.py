@@ -13,6 +13,10 @@ class Vector2:
     def _is_zero(self) -> bool:
         return self.x == 0 and self.y == 0
 
+    def clear(self) -> None:
+        self.x = 0
+        self.y = 0
+
     # Arithmetic overloads
     def __add__(self, other: Vector2) -> Vector2:
         # Using type(self) ensures that if an IntVector2 adds something,
